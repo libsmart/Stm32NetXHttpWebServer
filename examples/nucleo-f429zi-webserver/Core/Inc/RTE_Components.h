@@ -23,8 +23,10 @@
 
 /* Defines ------------------------------------------------------------------*/
 /* STMicroelectronics.X-CUBE-AZRTOS-F4.1.1.0 */
+#define FILEX_ENABLED
 #define LAN8742
 #define THREADX_ENABLED
 #define NETXDUO_ENABLED
+#define NX_ADDONS_WEB_SERVER_ENABLED
 
 #endif /* __RTE_COMPONENTS_H__ */

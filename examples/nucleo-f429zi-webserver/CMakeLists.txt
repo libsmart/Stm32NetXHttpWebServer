@@ -49,7 +49,7 @@ else ()
     add_compile_options(-Og -g)
 endif ()
 
-include_directories(Core/Inc AZURE_RTOS/App NetXDuo/App NetXDuo/Target Drivers/STM32F4xx_HAL_Driver/Inc Drivers/STM32F4xx_HAL_Driver/Inc/Legacy Drivers/CMSIS/Device/ST/STM32F4xx/Include Drivers/CMSIS/Include Drivers/BSP/Components/lan8742/ Middlewares/ST/netxduo/addons/dns/ Middlewares/ST/netxduo/addons/dhcp/ Middlewares/ST/netxduo/common/inc/ Middlewares/ST/netxduo/ports/cortex_m4/gnu/inc/ Middlewares/ST/netxduo/common/drivers/ethernet/ Middlewares/ST/threadx/common/inc/ Middlewares/ST/threadx/ports/cortex_m4/gnu/inc/
+include_directories(Core/Inc AZURE_RTOS/App NetXDuo/App NetXDuo/Target Drivers/STM32F4xx_HAL_Driver/Inc Drivers/STM32F4xx_HAL_Driver/Inc/Legacy Drivers/CMSIS/Device/ST/STM32F4xx/Include Drivers/CMSIS/Include Drivers/BSP/Components/lan8742/ Middlewares/ST/netxduo/addons/dns/ Middlewares/ST/netxduo/addons/dhcp/ Middlewares/ST/netxduo/common/inc/ Middlewares/ST/netxduo/ports/cortex_m4/gnu/inc/ Middlewares/ST/netxduo/common/drivers/ethernet/ Middlewares/ST/threadx/common/inc/ Middlewares/ST/threadx/ports/cortex_m4/gnu/inc/ Middlewares/ST/netxduo/addons/web/ FileX/App Middlewares/ST/filex/common/inc/ Middlewares/ST/filex/ports/generic/inc/
     AppCore
     ../../src
     Lib/Stm32Common/src
@@ -60,9 +60,9 @@ include_directories(Core/Inc AZURE_RTOS/App NetXDuo/App NetXDuo/Target Drivers/S
     Lib/Stm32NetX/src
 )
 
-add_definitions(-DDEBUG -DTX_INCLUDE_USER_DEFINE_FILE -DNX_INCLUDE_USER_DEFINE_FILE -DUSE_HAL_DRIVER -DSTM32F429xx)
+add_definitions(-DDEBUG -DTX_INCLUDE_USER_DEFINE_FILE -DNX_INCLUDE_USER_DEFINE_FILE -DUSE_HAL_DRIVER -DSTM32F429xx -DFX_INCLUDE_USER_DEFINE_FILE)
 
-file(GLOB_RECURSE SOURCES "AZURE_RTOS/*.*" "NetXDuo/*.*" "Core/*.*" "Middlewares/*.*" "Drivers/*.*"
+file(GLOB_RECURSE SOURCES "AZURE_RTOS/*.*" "FileX/*.*" "NetXDuo/*.*" "Core/*.*" "Middlewares/*.*" "Drivers/*.*"
     "AppCore/*.*"
     "../../src/*.*"
     "Lib/Stm32Common/src/*.*"
