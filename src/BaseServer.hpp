@@ -52,6 +52,29 @@ namespace Stm32NetXHttpWebServer {
          */
         bool isCreated();
 
+        using authentication_check_callback = UINT (*)(NX_WEB_HTTP_SERVER *server_ptr,
+                                                       UINT request_type, CHAR *resource, CHAR **name,
+                                                       CHAR **password, CHAR **realm);
+        using request_notify_callback = UINT (*)(NX_WEB_HTTP_SERVER *server_ptr,
+                                                 UINT request_type, CHAR *resource, NX_PACKET *packet_ptr);
+
+        UINT create(CHAR *http_server_name,
+                    NX_IP *ip_ptr,
+                    UINT server_port,
+                    FX_MEDIA *media_ptr,
+                    VOID *stack_ptr,
+                    ULONG stack_size,
+                    NX_PACKET_POOL *pool_ptr,
+                    authentication_check_callback authentication_check,
+                    request_notify_callback request_notify
+        );
+
+        UINT del();
+
+        UINT start();
+
+        UINT stop();
+
 
 #if defined(LIBSMART_STM32NETX_ENABLE_TLS) && defined(NX_WEB_HTTPS_ENABLE)
 
