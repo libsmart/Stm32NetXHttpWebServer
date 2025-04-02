@@ -51,6 +51,74 @@ void setup() {
     Serial3.flush();
 }
 
+UCHAR buffer[1440];
+
+UINT my_request_notify(NX_WEB_HTTP_SERVER *server_ptr, UINT request_type, CHAR *resource, NX_PACKET *packet_ptr) {
+    UINT status = NX_SUCCESS;
+    ULONG offset, length;
+    NX_PACKET *response_pkt;
+
+    if (request_type == NX_WEB_HTTP_SERVER_GET_REQUEST) {
+        char str_ptr1[100];
+        char str_ptr2[100];
+        UINT str_size = 0;
+
+        Logger.printf("URL = %s\r\n", server_ptr->nx_web_http_server_request_resource);
+        Logger.printf("resource = %s\r\n", resource);
+
+        // LIBSMART_ARRAYFILL(str_ptr1);
+        // LIBSMART_ARRAYFILL(str_ptr2);
+        // webServer.type_get_extended(str_ptr1, sizeof(str_ptr1), str_ptr2, sizeof(str_ptr2), &str_size);
+        // Logger.printf("name = %s\r\n", str_ptr1);
+        // Logger.printf("type = %s\r\n", str_ptr2);
+
+        // LIBSMART_ARRAYFILL(str_ptr1);
+        // LIBSMART_ARRAYFILL(str_ptr2);
+        // webServer.param_get(packet_ptr, 0, str_ptr, &str_size, sizeof(str_ptr));
+        // Logger.printf("param_ptr = %s\r\n", str_ptr);
+
+        LIBSMART_ARRAYFILL(str_ptr1);
+        LIBSMART_ARRAYFILL(str_ptr2);
+        webServer.query_get(packet_ptr, 0, str_ptr1, &str_size, sizeof(str_ptr1));
+        Logger.printf("query_ptr = %s\r\n", str_ptr1);
+
+        return (NX_SUCCESS);
+    }
+
+    /* Process multipart data. */
+    if (request_type == NX_WEB_HTTP_SERVER_POST_REQUEST) {
+        /* Get the content header. */
+        while (nx_web_http_server_get_entity_header(server_ptr, &packet_ptr, buffer,
+                                                    sizeof(buffer)) == NX_SUCCESS) {
+            /* Header obtained successfully. Get the content data location. */
+            while (nx_web_http_server_get_entity_content(server_ptr, &packet_ptr, &offset, &length) == NX_SUCCESS) {
+                /* Write content data to buffer. */
+                nx_packet_data_extract_offset(packet_ptr, offset, buffer, length, &length);
+                buffer[length] = 0;
+            }
+        }
+
+        /* Generate HTTP header. */
+        status = nx_web_http_server_callback_generate_response_header(server_ptr,
+                                                                      &response_pkt, NX_WEB_HTTP_STATUS_OK, 800,
+                                                                      "text/html",
+                                                                      "Server: NetX WEB HTTP 5.10\r\n");
+
+        if (status == NX_SUCCESS) {
+            if (nx_web_http_server_callback_packet_send(server_ptr, response_pkt) !=
+                NX_SUCCESS) {
+                nx_packet_release(response_pkt);
+            }
+        }
+    } else {
+        /* Indicate we have not processed the response to client yet.*/
+        return (NX_SUCCESS);
+    }
+
+    /* Indicate the response to client is transmitted. */
+    return (NX_WEB_HTTP_CALLBACK_COMPLETED);
+}
+
 
 void loopOnce() {
     Stm32ItmLogger::logger.setSeverity(Stm32ItmLogger::LoggerInterface::Severity::INFORMATIONAL)
@@ -66,7 +134,24 @@ void loopOnce() {
     Stm32NetX::NX->getConfig()->hostname = hostname;
     Stm32NetX::NX->begin();
 
+    while (!Stm32NetX::NX->isIpSet()) {
+        delay(500);
+    }
 
+    static uint8_t webServerStack[2048]{};
+    webServer.create(
+        webServer.getNameNonConst(),
+        Stm32NetX::NX->getIpInstance(),
+        80,
+        nullptr,
+        &webServerStack,
+        sizeof(webServerStack),
+        Stm32NetX::NX->getPacketPool(),
+        nullptr,
+        my_request_notify
+    );
+
+    webServer.start();
 }
 
 /**
@@ -99,7 +184,6 @@ void loop() {
  * @see Error_Handler() in Core/Src/main.c
  */
 [[noreturn]] void errorHandler() {
-
 #if ENABLE_FP==1
     fpSensor.errorHandler();
 #endif

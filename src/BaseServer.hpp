@@ -39,8 +39,16 @@ namespace Stm32NetXHttpWebServer {
         };
 
 
-        BaseServer() : NX_WEB_HTTP_SERVER() { ; }
+        BaseServer() : BaseServer(nullptr, Stm32ItmLogger::emptyLogger) { ; }
 
+        explicit BaseServer(Stm32ItmLogger::LoggerInterface &logger)
+            : BaseServer(nullptr, logger) { ; }
+
+        explicit BaseServer(const char *name)
+            : BaseServer(name, Stm32ItmLogger::emptyLogger) { ; }
+
+        BaseServer(const char *name, Stm32ItmLogger::LoggerInterface &logger)
+            : NX_WEB_HTTP_SERVER(), Loggable(&logger), Nameable(name) { ; }
 
         /**
          * Checks if the base server has been successfully created.
@@ -74,6 +82,15 @@ namespace Stm32NetXHttpWebServer {
         UINT start();
 
         UINT stop();
+
+        UINT type_get_extended(CHAR *name, UINT name_length,
+                               CHAR *http_type_string, UINT http_type_string_max_size, UINT *string_size);
+
+        UINT param_get(NX_PACKET *packet_ptr, UINT param_number, CHAR *param_ptr, UINT *param_size,
+                       UINT max_param_size);
+
+        UINT query_get(NX_PACKET *packet_ptr, UINT query_number, CHAR *query_ptr, UINT *query_size,
+                       UINT max_query_size);
 
 
 #if defined(LIBSMART_STM32NETX_ENABLE_TLS) && defined(NX_WEB_HTTPS_ENABLE)

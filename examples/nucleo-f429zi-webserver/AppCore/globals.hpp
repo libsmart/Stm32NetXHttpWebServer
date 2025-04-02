@@ -13,13 +13,14 @@
 
 #include "Stm32ItmLogger.hpp"
 #include <cstdint>
+#include <Server.hpp>
+#include <Stm32NetXHttpWebServer.hpp>
 #include "PinDigitalIn.hpp"
 #include "PinDigitalOut.hpp"
 #include "Dns/Dns.hpp"
 #include "Driver/Stm32HalUartItDriver.hpp"
 #include "ezShell/Shell.hpp"
 #include "StreamSession/GeneralStreamSession.hpp"
-
 
 extern "C" {
 #include "globals.h"
@@ -39,7 +40,7 @@ inline Stm32Common::StreamSession::Manager<Stm32Shell::ezShell::Shell, 1> micror
 inline Stm32Serial::Stm32HalUartItDriver uart3Driver(&huart3, "uart3Driver");
 inline Stm32Serial::Stm32Serial Serial3(&uart3Driver, &microrlStreamSessionManager);
 
-
+inline Stm32NetXHttpWebServer::Server webServer("webserver", Logger);
 
 
 #endif
