@@ -10,7 +10,6 @@
  */
 
 #include "main.hpp"
-
 #include "eth.h"
 #include "globals.hpp"
 #include "RunEvery.hpp"
@@ -20,7 +19,10 @@
 #include "Stm32NetX.hpp"
 #include "Command/RegisterCommands.hpp"
 #include "Dns/Dns.hpp"
-
+#include "wwwroot.h"
+#include "Exception/NetXHttpWebServerException.hpp"
+#include "Packet/Packet.hpp"
+#include "String/FixedString.hpp"
 
 /**
  * @brief Setup function.
@@ -35,7 +37,6 @@ void setup() {
     dummyCandCpp = 0;
 
     ::AppCore::Command::RegisterCommands()();
-
 
     Serial3.begin();
     // print welcome message
@@ -57,6 +58,9 @@ UINT my_request_notify(NX_WEB_HTTP_SERVER *server_ptr, UINT request_type, CHAR *
     UINT status = NX_SUCCESS;
     ULONG offset, length;
     NX_PACKET *response_pkt;
+    // Stm32NetX::Packet responsePacket;
+
+    const Stm32Common::String::FixedString<100> res(resource);
 
     if (request_type == NX_WEB_HTTP_SERVER_GET_REQUEST) {
         char str_ptr1[100];
@@ -77,10 +81,58 @@ UINT my_request_notify(NX_WEB_HTTP_SERVER *server_ptr, UINT request_type, CHAR *
         // webServer.param_get(packet_ptr, 0, str_ptr, &str_size, sizeof(str_ptr));
         // Logger.printf("param_ptr = %s\r\n", str_ptr);
 
-        LIBSMART_ARRAYFILL(str_ptr1);
-        LIBSMART_ARRAYFILL(str_ptr2);
-        webServer.query_get(packet_ptr, 0, str_ptr1, &str_size, sizeof(str_ptr1));
-        Logger.printf("query_ptr = %s\r\n", str_ptr1);
+        // LIBSMART_ARRAYFILL(str_ptr1);
+        // LIBSMART_ARRAYFILL(str_ptr2);
+        // webServer.query_get(packet_ptr, 0, str_ptr1, &str_size, sizeof(str_ptr1));
+        // Logger.printf("query_ptr = %s\r\n", str_ptr1);
+
+        if (res == "/") {
+            try {
+                webServer.callback_generate_response_header(&response_pkt,
+                                                            NX_WEB_HTTP_STATUS_OK,
+                                                            index_html_len,
+                                                            "text/html",
+                                                            "Server: NetX WEB HTTP 5.10\r\n");
+            } catch (const Stm32NetXHttpWebServer::NetXHttpWebServerException &e) {
+                // Stm32ItmLogger::logger.println(e);
+                Stm32ItmLogger::logger.println(e.what());
+            } catch (...) {
+                throw;
+            }
+            /* Now add data to the packet. */
+            status = nx_packet_data_append(response_pkt, index_html, index_html_len,
+                                           server_ptr->nx_web_http_server_packet_pool_ptr, NX_WAIT_FOREVER);
+
+
+            if (status == NX_SUCCESS) {
+                if (nx_web_http_server_callback_packet_send(server_ptr, response_pkt) !=
+                    NX_SUCCESS) {
+                    nx_packet_release(response_pkt);
+                }
+            }
+        }
+
+        /*
+        if (res == "/img/Logo_mit_URL_Transparent_300.png") {
+            status = nx_web_http_server_callback_generate_response_header(server_ptr,
+                                                                          &response_pkt, NX_WEB_HTTP_STATUS_OK,
+                                                                          img_Logo_mit_URL_Transparent_300_png_len,
+                                                                          "text/html",
+                                                                          "Server: NetX WEB HTTP 5.10\r\n");
+
+            /* Now add data to the packet. #1#
+            status = nx_packet_data_append(response_pkt, img_Logo_mit_URL_Transparent_300_png,
+                                           img_Logo_mit_URL_Transparent_300_png_len,
+                                           server_ptr->nx_web_http_server_packet_pool_ptr, NX_WAIT_FOREVER);
+
+            if (status == NX_SUCCESS) {
+                if (nx_web_http_server_callback_packet_send(server_ptr, response_pkt) != NX_SUCCESS) {
+                    nx_packet_release(response_pkt);
+                }
+            }
+        }
+        */
+
 
         return (NX_SUCCESS);
     }
@@ -99,14 +151,13 @@ UINT my_request_notify(NX_WEB_HTTP_SERVER *server_ptr, UINT request_type, CHAR *
         }
 
         /* Generate HTTP header. */
-        status = nx_web_http_server_callback_generate_response_header(server_ptr,
+        const auto ret = webServer.callback_generate_response_header(
                                                                       &response_pkt, NX_WEB_HTTP_STATUS_OK, 800,
                                                                       "text/html",
                                                                       "Server: NetX WEB HTTP 5.10\r\n");
 
-        if (status == NX_SUCCESS) {
-            if (nx_web_http_server_callback_packet_send(server_ptr, response_pkt) !=
-                NX_SUCCESS) {
+        if (ret.isOk()) {
+            if (nx_web_http_server_callback_packet_send(server_ptr, response_pkt) != NX_SUCCESS) {
                 nx_packet_release(response_pkt);
             }
         }

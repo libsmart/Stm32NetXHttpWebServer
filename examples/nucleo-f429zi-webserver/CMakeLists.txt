@@ -1,7 +1,7 @@
 #THIS FILE IS AUTO GENERATED FROM THE TEMPLATE! DO NOT CHANGE!
 set(CMAKE_SYSTEM_NAME Generic)
 set(CMAKE_SYSTEM_VERSION 1)
-cmake_minimum_required(VERSION 3.30)
+cmake_minimum_required(VERSION 3.31)
 
 # specify cross-compilers and tools
 set(CMAKE_C_COMPILER arm-none-eabi-gcc)
@@ -58,6 +58,7 @@ include_directories(Core/Inc AZURE_RTOS/App NetXDuo/App NetXDuo/Target Drivers/S
     Lib/Stm32Serial/src
     Lib/Stm32ThreadX/src
     Lib/Stm32NetX/src
+    Lib/Stm32Shell/src
 )
 
 add_definitions(-DDEBUG -DTX_INCLUDE_USER_DEFINE_FILE -DNX_INCLUDE_USER_DEFINE_FILE -DUSE_HAL_DRIVER -DSTM32F429xx -DFX_INCLUDE_USER_DEFINE_FILE)
@@ -97,3 +98,6 @@ target_link_libraries(${PROJECT_NAME}.elf PRIVATE Stm32ItmLogger)
 
 add_subdirectory(Lib/Stm32Shell)
 target_link_libraries(${PROJECT_NAME}.elf PRIVATE Stm32Shell)
+
+add_subdirectory(wwwroot)
+target_link_libraries(${PROJECT_NAME}.elf PRIVATE wwwroot)

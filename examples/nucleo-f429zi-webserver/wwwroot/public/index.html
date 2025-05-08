@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>MCU UI</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: sans-serif;
+            display: flex;
+            height: 100vh;
+        }
+
+        nav {
+            width: 150px;
+            background: #222;
+            color: #fff;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+
+        nav a {
+            display: block;
+            color: #fff;
+            text-decoration: none;
+            margin: 10px 0;
+        }
+
+        nav a:hover {
+            background: #444;
+        }
+
+        main {
+            flex-grow: 1;
+            padding: 20px;
+        }
+
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+<nav>
+    <a href="#" onclick="showPage('page1')">Dashboard</a>
+    <a href="#" onclick="showPage('page2')">Einstellungen</a>
+    <a href="#" onclick="showPage('page3')">Info</a>
+</nav>
+<main>
+
+    <div id="page1" class="page active">
+        <h1>Dashboard</h1>
+        <p>System läuft einwandfrei.</p>
+        <img src="img/Logo_mit_URL_Transparent_300.png"/>
+    </div>
+
+    <div id="page2" class="page">
+        <h1>Einstellungen</h1>
+        <p>Hier könnten Einstellungen stehen.</p>
+    </div>
+
+    <div id="page3" class="page">
+        <h1>Info</h1>
+        <p>Version 1.0 – Embedded UI</p>
+    </div>
+
+</main>
+
+<script>
+    function showPage(id) {
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+    }
+</script>
+</body>
+</html>

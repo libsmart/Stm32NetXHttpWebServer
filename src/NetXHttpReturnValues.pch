@@ -1,0 +1,712 @@
+/*
+ * SPDX-FileCopyrightText: 2025 Roland Rusch, easy-smart solution GmbH <roland.rusch@easy-smart.ch>
+ * SPDX-License-Identifier: AGPL-3.0-only
+ */
+
+#pragma once
+#include <libsmart_config.hpp>
+#include <climits>
+#include <optional>
+#include <variant>
+
+#include "NetXReturnValues.hpp"
+#include "Hash/Fnv1a.hpp"
+
+extern "C" {
+#include "nx_api.h"
+#include "nx_web_http_common.h"
+}
+
+using namespace Stm32Common::Hash;
+
+#if defined(LIBSMART_ENABLE_ERROR_STRINGS)
+#define LIBSMART_CONSTEXPR_CHAR(name, str) static constexpr char name[] = str;
+#else
+#define LIBSMART_CONSTEXPR_CHAR(name, str)
+#endif
+
+namespace Stm32NetX {
+    struct NetXHttpReturnValues {
+        /*
+        struct NONE {
+            LIBSMART_CONSTEXPR_CHAR(name, "NONE");
+            static constexpr FNV1a::fnv1a32_t strHash = FNV1a::hash("NONE");
+            static constexpr UINT apiReturnValue = UINT_MAX;
+        };
+        */
+
+        /// HTTP internal error
+        struct WEB_HTTP_ERROR {
+            LIBSMART_CONSTEXPR_CHAR(name, "NX_WEB_HTTP_ERROR");
+            static constexpr FNV1a::fnv1a32_t strHash = FNV1a::hash("NX_WEB_HTTP_ERROR");
+            static constexpr UINT apiReturnValue = NX_WEB_HTTP_ERROR;
+        };
+
+        /// HTTP timeout occurred
+        struct WEB_HTTP_TIMEOUT {
+            LIBSMART_CONSTEXPR_CHAR(name, "NX_WEB_HTTP_TIMEOUT");
+            static constexpr FNV1a::fnv1a32_t strHash = FNV1a::hash("NX_WEB_HTTP_TIMEOUT");
+            static constexpr UINT apiReturnValue = NX_WEB_HTTP_TIMEOUT;
+        };
+
+        /// HTTP error
+        struct WEB_HTTP_FAILED {
+            LIBSMART_CONSTEXPR_CHAR(name, "NX_WEB_HTTP_FAILED");
+            static constexpr FNV1a::fnv1a32_t strHash = FNV1a::hash("NX_WEB_HTTP_FAILED");
+            static constexpr UINT apiReturnValue = NX_WEB_HTTP_FAILED;
+        };
+
+        /// HTTP authentication not needed
+        struct WEB_HTTP_DONT_AUTHENTICATE {
+            LIBSMART_CONSTEXPR_CHAR(name, "NX_WEB_HTTP_DONT_AUTHENTICATE");
+            static constexpr FNV1a::fnv1a32_t strHash = FNV1a::hash("NX_WEB_HTTP_DONT_AUTHENTICATE");
+            static constexpr UINT apiReturnValue = NX_WEB_HTTP_DONT_AUTHENTICATE;
+        };
+
+        /// HTTP basic authentication requested
+        struct WEB_HTTP_BASIC_AUTHENTICATE {
+            LIBSMART_CONSTEXPR_CHAR(name, "NX_WEB_HTTP_BASIC_AUTHENTICATE");
+            static constexpr FNV1a::fnv1a32_t strHash = FNV1a::hash("NX_WEB_HTTP_BASIC_AUTHENTICATE");
+            static constexpr UINT apiReturnValue = NX_WEB_HTTP_BASIC_AUTHENTICATE;
+        };
+
+        /// HTTP digest authentication requested
+        struct WEB_HTTP_DIGEST_AUTHENTICATE {
+            LIBSMART_CONSTEXPR_CHAR(name, "NX_WEB_HTTP_DIGEST_AUTHENTICATE");
+            static constexpr FNV1a::fnv1a32_t strHash = FNV1a::hash("NX_WEB_HTTP_DIGEST_AUTHENTICATE");
+            static constexpr UINT apiReturnValue = NX_WEB_HTTP_DIGEST_AUTHENTICATE;
+        };
+
+        /// HTTP request not found
+        struct WEB_HTTP_NOT_FOUND {
+            LIBSMART_CONSTEXPR_CHAR(name, "NX_WEB_HTTP_NOT_FOUND");
+            static constexpr FNV1a::fnv1a32_t strHash = FNV1a::hash("NX_WEB_HTTP_NOT_FOUND");
+            static constexpr UINT apiReturnValue = NX_WEB_HTTP_NOT_FOUND;
+        };
+
+        /// HTTP end of content area
+        struct WEB_HTTP_DATA_END {
+            LIBSMART_CONSTEXPR_CHAR(name, "NX_WEB_HTTP_DATA_END");
+            static constexpr FNV1a::fnv1a32_t strHash = FNV1a::hash("NX_WEB_HTTP_DATA_END");
+            static constexpr UINT apiReturnValue = NX_WEB_HTTP_DATA_END;
+        };
+
+        /// HTTP user callback completed the processing
+        struct WEB_HTTP_CALLBACK_COMPLETED {
+            LIBSMART_CONSTEXPR_CHAR(name, "NX_WEB_HTTP_CALLBACK_COMPLETED");
+            static constexpr FNV1a::fnv1a32_t strHash = FNV1a::hash("NX_WEB_HTTP_CALLBACK_COMPLETED");
+            static constexpr UINT apiReturnValue = NX_WEB_HTTP_CALLBACK_COMPLETED;
+        };
+
+        /// HTTP supplied pool payload is too small
+        struct WEB_HTTP_POOL_ERROR {
+            LIBSMART_CONSTEXPR_CHAR(name, "NX_WEB_HTTP_POOL_ERROR");
+            static constexpr FNV1a::fnv1a32_t strHash = FNV1a::hash("NX_WEB_HTTP_POOL_ERROR");
+            static constexpr UINT apiReturnValue = NX_WEB_HTTP_POOL_ERROR;
+        };
+
+        /// HTTP client not ready for operation
+        struct WEB_HTTP_NOT_READY {
+            LIBSMART_CONSTEXPR_CHAR(name, "NX_WEB_HTTP_NOT_READY");
+            static constexpr FNV1a::fnv1a32_t strHash = FNV1a::hash("NX_WEB_HTTP_NOT_READY");
+            static constexpr UINT apiReturnValue = NX_WEB_HTTP_NOT_READY;
+        };
+
+        /// HTTP client get is complete
+        struct WEB_HTTP_GET_DONE {
+            LIBSMART_CONSTEXPR_CHAR(name, "NX_WEB_HTTP_GET_DONE");
+            static constexpr FNV1a::fnv1a32_t strHash = FNV1a::hash("NX_WEB_HTTP_GET_DONE");
+            static constexpr UINT apiReturnValue = NX_WEB_HTTP_GET_DONE;
+        };
+
+        /// Invalid packet received - length incorrect
+        struct WEB_HTTP_BAD_PACKET_LENGTH {
+            LIBSMART_CONSTEXPR_CHAR(name, "NX_WEB_HTTP_BAD_PACKET_LENGTH");
+            static constexpr FNV1a::fnv1a32_t strHash = FNV1a::hash("NX_WEB_HTTP_BAD_PACKET_LENGTH");
+            static constexpr UINT apiReturnValue = NX_WEB_HTTP_BAD_PACKET_LENGTH;
+        };
+
+        /// Received an error code instead of 2xx from server
+        struct WEB_HTTP_REQUEST_UNSUCCESSFUL_CODE {
+            LIBSMART_CONSTEXPR_CHAR(name, "NX_WEB_HTTP_REQUEST_UNSUCCESSFUL_CODE");
+            static constexpr FNV1a::fnv1a32_t strHash = FNV1a::hash("NX_WEB_HTTP_REQUEST_UNSUCCESSFUL_CODE");
+            static constexpr UINT apiReturnValue = NX_WEB_HTTP_REQUEST_UNSUCCESSFUL_CODE;
+        };
+
+        /// Server responds before PUT is complete
+        struct WEB_HTTP_INCOMPLETE_PUT_ERROR {
+            LIBSMART_CONSTEXPR_CHAR(name, "NX_WEB_HTTP_INCOMPLETE_PUT_ERROR");
+            static constexpr FNV1a::fnv1a32_t strHash = FNV1a::hash("NX_WEB_HTTP_INCOMPLETE_PUT_ERROR");
+            static constexpr UINT apiReturnValue = NX_WEB_HTTP_INCOMPLETE_PUT_ERROR;
+        };
+
+        /// Password exceeded expected length
+        struct WEB_HTTP_PASSWORD_TOO_LONG {
+            LIBSMART_CONSTEXPR_CHAR(name, "NX_WEB_HTTP_PASSWORD_TOO_LONG");
+            static constexpr FNV1a::fnv1a32_t strHash = FNV1a::hash("NX_WEB_HTTP_PASSWORD_TOO_LONG");
+            static constexpr UINT apiReturnValue = NX_WEB_HTTP_PASSWORD_TOO_LONG;
+        };
+
+        /// Username exceeded expected length
+        struct WEB_HTTP_USERNAME_TOO_LONG {
+            LIBSMART_CONSTEXPR_CHAR(name, "NX_WEB_HTTP_USERNAME_TOO_LONG");
+            static constexpr FNV1a::fnv1a32_t strHash = FNV1a::hash("NX_WEB_HTTP_USERNAME_TOO_LONG");
+            static constexpr UINT apiReturnValue = NX_WEB_HTTP_USERNAME_TOO_LONG;
+        };
+
+        /// Server unable to find query in client request
+        struct WEB_HTTP_NO_QUERY_PARSED {
+            LIBSMART_CONSTEXPR_CHAR(name, "NX_WEB_HTTP_NO_QUERY_PARSED");
+            static constexpr FNV1a::fnv1a32_t strHash = FNV1a::hash("NX_WEB_HTTP_NO_QUERY_PARSED");
+            static constexpr UINT apiReturnValue = NX_WEB_HTTP_NO_QUERY_PARSED;
+        };
+
+        /// Client method (e.g. GET, POST) was missing required information
+        struct WEB_HTTP_METHOD_ERROR {
+            LIBSMART_CONSTEXPR_CHAR(name, "NX_WEB_HTTP_METHOD_ERROR");
+            static constexpr FNV1a::fnv1a32_t strHash = FNV1a::hash("NX_WEB_HTTP_METHOD_ERROR");
+            static constexpr UINT apiReturnValue = NX_WEB_HTTP_METHOD_ERROR;
+        };
+
+        /// Client request parameter not properly terminated
+        struct WEB_HTTP_IMPROPERLY_TERMINATED_PARAM {
+            LIBSMART_CONSTEXPR_CHAR(name, "NX_WEB_HTTP_IMPROPERLY_TERMINATED_PARAM");
+            static constexpr FNV1a::fnv1a32_t strHash = FNV1a::hash("NX_WEB_HTTP_IMPROPERLY_TERMINATED_PARAM");
+            static constexpr UINT apiReturnValue = NX_WEB_HTTP_IMPROPERLY_TERMINATED_PARAM;
+        };
+
+        /// Boundary is already found
+        struct WEB_HTTP_BOUNDARY_ALREADY_FOUND {
+            LIBSMART_CONSTEXPR_CHAR(name, "NX_WEB_HTTP_BOUNDARY_ALREADY_FOUND");
+            static constexpr FNV1a::fnv1a32_t strHash = FNV1a::hash("NX_WEB_HTTP_BOUNDARY_ALREADY_FOUND");
+            static constexpr UINT apiReturnValue = NX_WEB_HTTP_BOUNDARY_ALREADY_FOUND;
+        };
+
+        /// The Content-Length header was not found
+        struct WEB_HTTP_MISSING_CONTENT_LENGTH {
+            LIBSMART_CONSTEXPR_CHAR(name, "NX_WEB_HTTP_MISSING_CONTENT_LENGTH");
+            static constexpr FNV1a::fnv1a32_t strHash = FNV1a::hash("NX_WEB_HTTP_MISSING_CONTENT_LENGTH");
+            static constexpr UINT apiReturnValue = NX_WEB_HTTP_MISSING_CONTENT_LENGTH;
+        };
+
+        /// A searched-for HTTP type extension was not found
+        struct WEB_HTTP_EXTENSION_NOT_FOUND {
+            LIBSMART_CONSTEXPR_CHAR(name, "NX_WEB_HTTP_EXTENSION_NOT_FOUND");
+            static constexpr FNV1a::fnv1a32_t strHash = FNV1a::hash("NX_WEB_HTTP_EXTENSION_NOT_FOUND");
+            static constexpr UINT apiReturnValue = NX_WEB_HTTP_EXTENSION_NOT_FOUND;
+        };
+
+        /// No matching extension found, return default
+        struct WEB_HTTP_EXTENSION_MIME_DEFAULT {
+            LIBSMART_CONSTEXPR_CHAR(name, "NX_WEB_HTTP_EXTENSION_MIME_DEFAULT");
+            static constexpr FNV1a::fnv1a32_t strHash = FNV1a::hash("NX_WEB_HTTP_EXTENSION_MIME_DEFAULT");
+            static constexpr UINT apiReturnValue = NX_WEB_HTTP_EXTENSION_MIME_DEFAULT;
+        };
+
+
+        /// HTTP status code 100 Continue
+        struct WEB_HTTP_STATUS_CODE_CONTINUE {
+            LIBSMART_CONSTEXPR_CHAR(name, "NX_WEB_HTTP_STATUS_CODE_CONTINUE");
+            static constexpr FNV1a::fnv1a32_t strHash = FNV1a::hash("NX_WEB_HTTP_STATUS_CODE_CONTINUE");
+            static constexpr UINT apiReturnValue = NX_WEB_HTTP_STATUS_CODE_CONTINUE;
+        };
+
+        /// HTTP status code 101 Switching Protocols
+        struct WEB_HTTP_STATUS_CODE_SWITCHING_PROTOCOLS {
+            LIBSMART_CONSTEXPR_CHAR(name, "NX_WEB_HTTP_STATUS_CODE_SWITCHING_PROTOCOLS");
+            static constexpr FNV1a::fnv1a32_t strHash = FNV1a::hash("NX_WEB_HTTP_STATUS_CODE_SWITCHING_PROTOCOLS");
+            static constexpr UINT apiReturnValue = NX_WEB_HTTP_STATUS_CODE_SWITCHING_PROTOCOLS;
+        };
+
+        /// HTTP status code 201 Created
+        struct WEB_HTTP_STATUS_CODE_CREATED {
+            LIBSMART_CONSTEXPR_CHAR(name, "NX_WEB_HTTP_STATUS_CODE_CREATED");
+            static constexpr FNV1a::fnv1a32_t strHash = FNV1a::hash("NX_WEB_HTTP_STATUS_CODE_CREATED");
+            static constexpr UINT apiReturnValue = NX_WEB_HTTP_STATUS_CODE_CREATED;
+        };
+
+        /// HTTP status code 202 Accepted
+        struct WEB_HTTP_STATUS_CODE_ACCEPTED {
+            LIBSMART_CONSTEXPR_CHAR(name, "NX_WEB_HTTP_STATUS_CODE_ACCEPTED");
+            static constexpr FNV1a::fnv1a32_t strHash = FNV1a::hash("NX_WEB_HTTP_STATUS_CODE_ACCEPTED");
+            static constexpr UINT apiReturnValue = NX_WEB_HTTP_STATUS_CODE_ACCEPTED;
+        };
+
+        /// HTTP status code 203 Non-Authoritative Information
+        struct WEB_HTTP_STATUS_CODE_NON_AUTH_INFO {
+            LIBSMART_CONSTEXPR_CHAR(name, "NX_WEB_HTTP_STATUS_CODE_NON_AUTH_INFO");
+            static constexpr FNV1a::fnv1a32_t strHash = FNV1a::hash("NX_WEB_HTTP_STATUS_CODE_NON_AUTH_INFO");
+            static constexpr UINT apiReturnValue = NX_WEB_HTTP_STATUS_CODE_NON_AUTH_INFO;
+        };
+
+        /// HTTP status code 204 No Content
+        struct WEB_HTTP_STATUS_CODE_NO_CONTENT {
+            LIBSMART_CONSTEXPR_CHAR(name, "NX_WEB_HTTP_STATUS_CODE_NO_CONTENT");
+            static constexpr FNV1a::fnv1a32_t strHash = FNV1a::hash("NX_WEB_HTTP_STATUS_CODE_NO_CONTENT");
+            static constexpr UINT apiReturnValue = NX_WEB_HTTP_STATUS_CODE_NO_CONTENT;
+        };
+
+        /// HTTP status code 205 Reset Content
+        struct WEB_HTTP_STATUS_CODE_RESET_CONTENT {
+            LIBSMART_CONSTEXPR_CHAR(name, "NX_WEB_HTTP_STATUS_CODE_RESET_CONTENT");
+            static constexpr FNV1a::fnv1a32_t strHash = FNV1a::hash("NX_WEB_HTTP_STATUS_CODE_RESET_CONTENT");
+            static constexpr UINT apiReturnValue = NX_WEB_HTTP_STATUS_CODE_RESET_CONTENT;
+        };
+
+        /// HTTP status code 206 Partial Content
+        struct WEB_HTTP_STATUS_CODE_PARTIAL_CONTENT {
+            LIBSMART_CONSTEXPR_CHAR(name, "NX_WEB_HTTP_STATUS_CODE_PARTIAL_CONTENT");
+            static constexpr FNV1a::fnv1a32_t strHash = FNV1a::hash("NX_WEB_HTTP_STATUS_CODE_PARTIAL_CONTENT");
+            static constexpr UINT apiReturnValue = NX_WEB_HTTP_STATUS_CODE_PARTIAL_CONTENT;
+        };
+
+        /// HTTP status code 300 Multiple Choices
+        struct WEB_HTTP_STATUS_CODE_MULTIPLE_CHOICES {
+            LIBSMART_CONSTEXPR_CHAR(name, "NX_WEB_HTTP_STATUS_CODE_MULTIPLE_CHOICES");
+            static constexpr FNV1a::fnv1a32_t strHash = FNV1a::hash("NX_WEB_HTTP_STATUS_CODE_MULTIPLE_CHOICES");
+            static constexpr UINT apiReturnValue = NX_WEB_HTTP_STATUS_CODE_MULTIPLE_CHOICES;
+        };
+
+        /// HTTP status code 301 Moved Permanently
+        struct WEB_HTTP_STATUS_CODE_MOVED_PERMANETLY {
+            LIBSMART_CONSTEXPR_CHAR(name, "NX_WEB_HTTP_STATUS_CODE_MOVED_PERMANETLY");
+            static constexpr FNV1a::fnv1a32_t strHash = FNV1a::hash("NX_WEB_HTTP_STATUS_CODE_MOVED_PERMANETLY");
+            static constexpr UINT apiReturnValue = NX_WEB_HTTP_STATUS_CODE_MOVED_PERMANETLY;
+        };
+
+        /// HTTP status code 302 Found
+        struct WEB_HTTP_STATUS_CODE_FOUND {
+            LIBSMART_CONSTEXPR_CHAR(name, "NX_WEB_HTTP_STATUS_CODE_FOUND");
+            static constexpr FNV1a::fnv1a32_t strHash = FNV1a::hash("NX_WEB_HTTP_STATUS_CODE_FOUND");
+            static constexpr UINT apiReturnValue = NX_WEB_HTTP_STATUS_CODE_FOUND;
+        };
+
+        /// HTTP status code 303 See Other
+        struct WEB_HTTP_STATUS_CODE_SEE_OTHER {
+            LIBSMART_CONSTEXPR_CHAR(name, "NX_WEB_HTTP_STATUS_CODE_SEE_OTHER");
+            static constexpr FNV1a::fnv1a32_t strHash = FNV1a::hash("NX_WEB_HTTP_STATUS_CODE_SEE_OTHER");
+            static constexpr UINT apiReturnValue = NX_WEB_HTTP_STATUS_CODE_SEE_OTHER;
+        };
+
+        /// HTTP status code 304 Not Modified
+        struct WEB_HTTP_STATUS_CODE_NOT_MODIFIED {
+            LIBSMART_CONSTEXPR_CHAR(name, "NX_WEB_HTTP_STATUS_CODE_NOT_MODIFIED");
+            static constexpr FNV1a::fnv1a32_t strHash = FNV1a::hash("NX_WEB_HTTP_STATUS_CODE_NOT_MODIFIED");
+            static constexpr UINT apiReturnValue = NX_WEB_HTTP_STATUS_CODE_NOT_MODIFIED;
+        };
+
+        /// HTTP status code 305 Use Proxy
+        struct WEB_HTTP_STATUS_CODE_USE_PROXY {
+            LIBSMART_CONSTEXPR_CHAR(name, "NX_WEB_HTTP_STATUS_CODE_USE_PROXY");
+            static constexpr FNV1a::fnv1a32_t strHash = FNV1a::hash("NX_WEB_HTTP_STATUS_CODE_USE_PROXY");
+            static constexpr UINT apiReturnValue = NX_WEB_HTTP_STATUS_CODE_USE_PROXY;
+        };
+
+        /// HTTP status code 307 Temporary Redirect
+        struct WEB_HTTP_STATUS_CODE_TEMPORARY_REDIRECT {
+            LIBSMART_CONSTEXPR_CHAR(name, "NX_WEB_HTTP_STATUS_CODE_TEMPORARY_REDIRECT");
+            static constexpr FNV1a::fnv1a32_t strHash = FNV1a::hash("NX_WEB_HTTP_STATUS_CODE_TEMPORARY_REDIRECT");
+            static constexpr UINT apiReturnValue = NX_WEB_HTTP_STATUS_CODE_TEMPORARY_REDIRECT;
+        };
+
+        /// HTTP status code 400 Bad Request
+        struct WEB_HTTP_STATUS_CODE_BAD_REQUEST {
+            LIBSMART_CONSTEXPR_CHAR(name, "NX_WEB_HTTP_STATUS_CODE_BAD_REQUEST");
+            static constexpr FNV1a::fnv1a32_t strHash = FNV1a::hash("NX_WEB_HTTP_STATUS_CODE_BAD_REQUEST");
+            static constexpr UINT apiReturnValue = NX_WEB_HTTP_STATUS_CODE_BAD_REQUEST;
+        };
+
+        /// HTTP status code 401 Unauthorized
+        struct WEB_HTTP_STATUS_CODE_UNAUTHORIZED {
+            LIBSMART_CONSTEXPR_CHAR(name, "NX_WEB_HTTP_STATUS_CODE_UNAUTHORIZED");
+            static constexpr FNV1a::fnv1a32_t strHash = FNV1a::hash("NX_WEB_HTTP_STATUS_CODE_UNAUTHORIZED");
+            static constexpr UINT apiReturnValue = NX_WEB_HTTP_STATUS_CODE_UNAUTHORIZED;
+        };
+
+        /// HTTP status code 402 Payment Required
+        struct WEB_HTTP_STATUS_CODE_PAYMENT_REQUIRED {
+            LIBSMART_CONSTEXPR_CHAR(name, "NX_WEB_HTTP_STATUS_CODE_PAYMENT_REQUIRED");
+            static constexpr FNV1a::fnv1a32_t strHash = FNV1a::hash("NX_WEB_HTTP_STATUS_CODE_PAYMENT_REQUIRED");
+            static constexpr UINT apiReturnValue = NX_WEB_HTTP_STATUS_CODE_PAYMENT_REQUIRED;
+        };
+
+        /// HTTP status code 403 Forbidden
+        struct WEB_HTTP_STATUS_CODE_FORBIDDEN {
+            LIBSMART_CONSTEXPR_CHAR(name, "NX_WEB_HTTP_STATUS_CODE_FORBIDDEN");
+            static constexpr FNV1a::fnv1a32_t strHash = FNV1a::hash("NX_WEB_HTTP_STATUS_CODE_FORBIDDEN");
+            static constexpr UINT apiReturnValue = NX_WEB_HTTP_STATUS_CODE_FORBIDDEN;
+        };
+
+        /// HTTP status code 404 Not Found
+        struct WEB_HTTP_STATUS_CODE_NOT_FOUND {
+            LIBSMART_CONSTEXPR_CHAR(name, "NX_WEB_HTTP_STATUS_CODE_NOT_FOUND");
+            static constexpr FNV1a::fnv1a32_t strHash = FNV1a::hash("NX_WEB_HTTP_STATUS_CODE_NOT_FOUND");
+            static constexpr UINT apiReturnValue = NX_WEB_HTTP_STATUS_CODE_NOT_FOUND;
+        };
+
+        /// HTTP status code 405 Method Not Allowed
+        struct WEB_HTTP_STATUS_CODE_METHOD_NOT_ALLOWED {
+            LIBSMART_CONSTEXPR_CHAR(name, "NX_WEB_HTTP_STATUS_CODE_METHOD_NOT_ALLOWED");
+            static constexpr FNV1a::fnv1a32_t strHash = FNV1a::hash("NX_WEB_HTTP_STATUS_CODE_METHOD_NOT_ALLOWED");
+            static constexpr UINT apiReturnValue = NX_WEB_HTTP_STATUS_CODE_METHOD_NOT_ALLOWED;
+        };
+
+        /// HTTP status code 406 Not Acceptable
+        struct WEB_HTTP_STATUS_CODE_NOT_ACCEPTABLE {
+            LIBSMART_CONSTEXPR_CHAR(name, "NX_WEB_HTTP_STATUS_CODE_NOT_ACCEPTABLE");
+            static constexpr FNV1a::fnv1a32_t strHash = FNV1a::hash("NX_WEB_HTTP_STATUS_CODE_NOT_ACCEPTABLE");
+            static constexpr UINT apiReturnValue = NX_WEB_HTTP_STATUS_CODE_NOT_ACCEPTABLE;
+        };
+
+        /// HTTP status code 407 Proxy Authentication Required
+        struct WEB_HTTP_STATUS_CODE_PROXY_AUTH_REQUIRED {
+            LIBSMART_CONSTEXPR_CHAR(name, "NX_WEB_HTTP_STATUS_CODE_PROXY_AUTH_REQUIRED");
+            static constexpr FNV1a::fnv1a32_t strHash = FNV1a::hash("NX_WEB_HTTP_STATUS_CODE_PROXY_AUTH_REQUIRED");
+            static constexpr UINT apiReturnValue = NX_WEB_HTTP_STATUS_CODE_PROXY_AUTH_REQUIRED;
+        };
+
+        /// HTTP status code 408 Request Time-out
+        struct WEB_HTTP_STATUS_CODE_REQUEST_TIMEOUT {
+            LIBSMART_CONSTEXPR_CHAR(name, "NX_WEB_HTTP_STATUS_CODE_REQUEST_TIMEOUT");
+            static constexpr FNV1a::fnv1a32_t strHash = FNV1a::hash("NX_WEB_HTTP_STATUS_CODE_REQUEST_TIMEOUT");
+            static constexpr UINT apiReturnValue = NX_WEB_HTTP_STATUS_CODE_REQUEST_TIMEOUT;
+        };
+
+        /// HTTP status code 409 Conflict
+        struct WEB_HTTP_STATUS_CODE_CONFLICT {
+            LIBSMART_CONSTEXPR_CHAR(name, "NX_WEB_HTTP_STATUS_CODE_CONFLICT");
+            static constexpr FNV1a::fnv1a32_t strHash = FNV1a::hash("NX_WEB_HTTP_STATUS_CODE_CONFLICT");
+            static constexpr UINT apiReturnValue = NX_WEB_HTTP_STATUS_CODE_CONFLICT;
+        };
+
+        /// HTTP status code 410 Gone
+        struct WEB_HTTP_STATUS_CODE_GONE {
+            LIBSMART_CONSTEXPR_CHAR(name, "NX_WEB_HTTP_STATUS_CODE_GONE");
+            static constexpr FNV1a::fnv1a32_t strHash = FNV1a::hash("NX_WEB_HTTP_STATUS_CODE_GONE");
+            static constexpr UINT apiReturnValue = NX_WEB_HTTP_STATUS_CODE_GONE;
+        };
+
+        /// HTTP status code 411 Length Required
+        struct WEB_HTTP_STATUS_CODE_LENGTH_REQUIRED {
+            LIBSMART_CONSTEXPR_CHAR(name, "NX_WEB_HTTP_STATUS_CODE_LENGTH_REQUIRED");
+            static constexpr FNV1a::fnv1a32_t strHash = FNV1a::hash("NX_WEB_HTTP_STATUS_CODE_LENGTH_REQUIRED");
+            static constexpr UINT apiReturnValue = NX_WEB_HTTP_STATUS_CODE_LENGTH_REQUIRED;
+        };
+
+        /// HTTP status code 412 Precondition Failed
+        struct WEB_HTTP_STATUS_CODE_PRECONDITION_FAILED {
+            LIBSMART_CONSTEXPR_CHAR(name, "NX_WEB_HTTP_STATUS_CODE_PRECONDITION_FAILED");
+            static constexpr FNV1a::fnv1a32_t strHash = FNV1a::hash("NX_WEB_HTTP_STATUS_CODE_PRECONDITION_FAILED");
+            static constexpr UINT apiReturnValue = NX_WEB_HTTP_STATUS_CODE_PRECONDITION_FAILED;
+        };
+
+        /// HTTP status code 413 Request Entity Too Large
+        struct WEB_HTTP_STATUS_CODE_ENTITY_TOO_LARGE {
+            LIBSMART_CONSTEXPR_CHAR(name, "NX_WEB_HTTP_STATUS_CODE_ENTITY_TOO_LARGE");
+            static constexpr FNV1a::fnv1a32_t strHash = FNV1a::hash("NX_WEB_HTTP_STATUS_CODE_ENTITY_TOO_LARGE");
+            static constexpr UINT apiReturnValue = NX_WEB_HTTP_STATUS_CODE_ENTITY_TOO_LARGE;
+        };
+
+        /// HTTP status code 414 Request URL Too Large
+        struct WEB_HTTP_STATUS_CODE_URL_TOO_LARGE {
+            LIBSMART_CONSTEXPR_CHAR(name, "NX_WEB_HTTP_STATUS_CODE_URL_TOO_LARGE");
+            static constexpr FNV1a::fnv1a32_t strHash = FNV1a::hash("NX_WEB_HTTP_STATUS_CODE_URL_TOO_LARGE");
+            static constexpr UINT apiReturnValue = NX_WEB_HTTP_STATUS_CODE_URL_TOO_LARGE;
+        };
+
+        /// HTTP status code 415 Unsupported Media Type
+        struct WEB_HTTP_STATUS_CODE_UNSUPPORTED_MEDIA {
+            LIBSMART_CONSTEXPR_CHAR(name, "NX_WEB_HTTP_STATUS_CODE_UNSUPPORTED_MEDIA");
+            static constexpr FNV1a::fnv1a32_t strHash = FNV1a::hash("NX_WEB_HTTP_STATUS_CODE_UNSUPPORTED_MEDIA");
+            static constexpr UINT apiReturnValue = NX_WEB_HTTP_STATUS_CODE_UNSUPPORTED_MEDIA;
+        };
+
+        /// HTTP status code 416 Requested range not satisfiable
+        struct WEB_HTTP_STATUS_CODE_RANGE_NOT_SATISFY {
+            LIBSMART_CONSTEXPR_CHAR(name, "NX_WEB_HTTP_STATUS_CODE_RANGE_NOT_SATISFY");
+            static constexpr FNV1a::fnv1a32_t strHash = FNV1a::hash("NX_WEB_HTTP_STATUS_CODE_RANGE_NOT_SATISFY");
+            static constexpr UINT apiReturnValue = NX_WEB_HTTP_STATUS_CODE_RANGE_NOT_SATISFY;
+        };
+
+        /// HTTP status code 417 Expectation Failed
+        struct WEB_HTTP_STATUS_CODE_EXPECTATION_FAILED {
+            LIBSMART_CONSTEXPR_CHAR(name, "NX_WEB_HTTP_STATUS_CODE_EXPECTATION_FAILED");
+            static constexpr FNV1a::fnv1a32_t strHash = FNV1a::hash("NX_WEB_HTTP_STATUS_CODE_EXPECTATION_FAILED");
+            static constexpr UINT apiReturnValue = NX_WEB_HTTP_STATUS_CODE_EXPECTATION_FAILED;
+        };
+
+        /// HTTP status code 500 Internal Server Error
+        struct WEB_HTTP_STATUS_CODE_INTERNAL_ERROR {
+            LIBSMART_CONSTEXPR_CHAR(name, "NX_WEB_HTTP_STATUS_CODE_INTERNAL_ERROR");
+            static constexpr FNV1a::fnv1a32_t strHash = FNV1a::hash("NX_WEB_HTTP_STATUS_CODE_INTERNAL_ERROR");
+            static constexpr UINT apiReturnValue = NX_WEB_HTTP_STATUS_CODE_INTERNAL_ERROR;
+        };
+
+        /// HTTP status code 501 Not Implemented
+        struct WEB_HTTP_STATUS_CODE_NOT_IMPLEMENTED {
+            LIBSMART_CONSTEXPR_CHAR(name, "NX_WEB_HTTP_STATUS_CODE_NOT_IMPLEMENTED");
+            static constexpr FNV1a::fnv1a32_t strHash = FNV1a::hash("NX_WEB_HTTP_STATUS_CODE_NOT_IMPLEMENTED");
+            static constexpr UINT apiReturnValue = NX_WEB_HTTP_STATUS_CODE_NOT_IMPLEMENTED;
+        };
+
+        /// HTTP status code 502 Bad Gateway
+        struct WEB_HTTP_STATUS_CODE_BAD_GATEWAY {
+            LIBSMART_CONSTEXPR_CHAR(name, "NX_WEB_HTTP_STATUS_CODE_BAD_GATEWAY");
+            static constexpr FNV1a::fnv1a32_t strHash = FNV1a::hash("NX_WEB_HTTP_STATUS_CODE_BAD_GATEWAY");
+            static constexpr UINT apiReturnValue = NX_WEB_HTTP_STATUS_CODE_BAD_GATEWAY;
+        };
+
+        /// HTTP status code 503 Service Unavailable
+        struct WEB_HTTP_STATUS_CODE_SERVICE_UNAVAILABLE {
+            LIBSMART_CONSTEXPR_CHAR(name, "NX_WEB_HTTP_STATUS_CODE_SERVICE_UNAVAILABLE");
+            static constexpr FNV1a::fnv1a32_t strHash = FNV1a::hash("NX_WEB_HTTP_STATUS_CODE_SERVICE_UNAVAILABLE");
+            static constexpr UINT apiReturnValue = NX_WEB_HTTP_STATUS_CODE_SERVICE_UNAVAILABLE;
+        };
+
+        /// HTTP status code 504 Gateway Time-out
+        struct WEB_HTTP_STATUS_CODE_GATEWAY_TIMEOUT {
+            LIBSMART_CONSTEXPR_CHAR(name, "NX_WEB_HTTP_STATUS_CODE_GATEWAY_TIMEOUT");
+            static constexpr FNV1a::fnv1a32_t strHash = FNV1a::hash("NX_WEB_HTTP_STATUS_CODE_GATEWAY_TIMEOUT");
+            static constexpr UINT apiReturnValue = NX_WEB_HTTP_STATUS_CODE_GATEWAY_TIMEOUT;
+        };
+
+        /// HTTP status code 505 HTTP Version not supported
+        struct WEB_HTTP_STATUS_CODE_VERSION_ERROR {
+            LIBSMART_CONSTEXPR_CHAR(name, "NX_WEB_HTTP_STATUS_CODE_VERSION_ERROR");
+            static constexpr FNV1a::fnv1a32_t strHash = FNV1a::hash("NX_WEB_HTTP_STATUS_CODE_VERSION_ERROR");
+            static constexpr UINT apiReturnValue = NX_WEB_HTTP_STATUS_CODE_VERSION_ERROR;
+        };
+
+        /*template<typename Variant, typename... Extra>
+        struct variant_flatten_append;
+
+        template<typename... Ts, typename... Extra>
+        struct variant_flatten_append<std::variant<Ts...>, Extra...> {
+            using type = std::variant<Ts..., Extra...>;
+        };
+
+        template<typename Variant, typename... Extra>
+        using variant_flatten_append_t = typename variant_flatten_append<Variant, Extra...>::type;*/
+
+        using Variant = std::variant<
+
+            NetXReturnValues::NONE,
+            NetXReturnValues::SUCCESS,
+            NetXReturnValues::NO_PACKET,
+            NetXReturnValues::UNDERFLOW,
+            NetXReturnValues::OVERFLOW,
+            NetXReturnValues::NO_MAPPING,
+            NetXReturnValues::DELETED,
+            NetXReturnValues::POOL_ERROR,
+            NetXReturnValues::PTR_ERROR,
+            NetXReturnValues::WAIT_ERROR,
+            NetXReturnValues::SIZE_ERROR,
+            NetXReturnValues::OPTION_ERROR,
+            NetXReturnValues::DELETE_ERROR,
+            NetXReturnValues::CALLER_ERROR,
+            NetXReturnValues::INVALID_PACKET,
+            NetXReturnValues::INVALID_SOCKET,
+            NetXReturnValues::NOT_ENABLED,
+            NetXReturnValues::ALREADY_ENABLED,
+            NetXReturnValues::ENTRY_NOT_FOUND,
+            NetXReturnValues::NO_MORE_ENTRIES,
+            NetXReturnValues::ARP_TIMER_ERROR,
+            NetXReturnValues::RESERVED_CODE0,
+            NetXReturnValues::WAIT_ABORTED,
+            NetXReturnValues::IP_INTERNAL_ERROR,
+            NetXReturnValues::IP_ADDRESS_ERROR,
+            NetXReturnValues::ALREADY_BOUND,
+            NetXReturnValues::PORT_UNAVAILABLE,
+            NetXReturnValues::NOT_BOUND,
+            NetXReturnValues::RESERVED_CODE1,
+            NetXReturnValues::SOCKET_UNBOUND,
+            NetXReturnValues::NOT_CREATED,
+            NetXReturnValues::SOCKETS_BOUND,
+            NetXReturnValues::NO_RESPONSE,
+            NetXReturnValues::POOL_DELETED,
+            NetXReturnValues::ALREADY_RELEASED,
+            NetXReturnValues::RESERVED_CODE2,
+            NetXReturnValues::MAX_LISTEN,
+            NetXReturnValues::DUPLICATE_LISTEN,
+            NetXReturnValues::NOT_CLOSED,
+            NetXReturnValues::NOT_LISTEN_STATE,
+            NetXReturnValues::IN_PROGRESS,
+            NetXReturnValues::NOT_CONNECTED,
+            NetXReturnValues::WINDOW_OVERFLOW,
+            NetXReturnValues::ALREADY_SUSPENDED,
+            NetXReturnValues::DISCONNECT_FAILED,
+            NetXReturnValues::STILL_BOUND,
+            NetXReturnValues::NOT_SUCCESSFUL,
+            NetXReturnValues::UNHANDLED_COMMAND,
+            NetXReturnValues::NO_FREE_PORTS,
+            NetXReturnValues::INVALID_PORT,
+            NetXReturnValues::INVALID_RELISTEN,
+            NetXReturnValues::CONNECTION_PENDING,
+            NetXReturnValues::TX_QUEUE_DEPTH,
+            NetXReturnValues::NOT_IMPLEMENTED,
+            NetXReturnValues::NOT_SUPPORTED,
+            NetXReturnValues::INVALID_INTERFACE,
+            NetXReturnValues::INVALID_PARAMETERS,
+            NetXReturnValues::NOT_FOUND,
+            NetXReturnValues::CANNOT_START,
+            NetXReturnValues::NO_INTERFACE_ADDRESS,
+            NetXReturnValues::INVALID_MTU_DATA,
+            NetXReturnValues::DUPLICATED_ENTRY,
+            NetXReturnValues::PACKET_OFFSET_ERROR,
+            NetXReturnValues::OPTION_HEADER_ERROR,
+            NetXReturnValues::CONTINUE,
+            NetXReturnValues::TCPIP_OFFLOAD_ERROR,
+
+
+            WEB_HTTP_ERROR,
+            WEB_HTTP_TIMEOUT,
+            WEB_HTTP_FAILED,
+            WEB_HTTP_DONT_AUTHENTICATE,
+            WEB_HTTP_BASIC_AUTHENTICATE,
+            WEB_HTTP_DIGEST_AUTHENTICATE,
+            WEB_HTTP_NOT_FOUND,
+            WEB_HTTP_DATA_END,
+            WEB_HTTP_CALLBACK_COMPLETED,
+            WEB_HTTP_POOL_ERROR,
+            WEB_HTTP_NOT_READY,
+            WEB_HTTP_GET_DONE,
+            WEB_HTTP_BAD_PACKET_LENGTH,
+            WEB_HTTP_REQUEST_UNSUCCESSFUL_CODE,
+            WEB_HTTP_INCOMPLETE_PUT_ERROR,
+            WEB_HTTP_PASSWORD_TOO_LONG,
+            WEB_HTTP_USERNAME_TOO_LONG,
+            WEB_HTTP_NO_QUERY_PARSED,
+            WEB_HTTP_METHOD_ERROR,
+            WEB_HTTP_IMPROPERLY_TERMINATED_PARAM,
+            WEB_HTTP_BOUNDARY_ALREADY_FOUND,
+            WEB_HTTP_MISSING_CONTENT_LENGTH,
+            WEB_HTTP_EXTENSION_NOT_FOUND,
+            WEB_HTTP_EXTENSION_MIME_DEFAULT,
+            WEB_HTTP_STATUS_CODE_CONTINUE,
+            WEB_HTTP_STATUS_CODE_SWITCHING_PROTOCOLS,
+            WEB_HTTP_STATUS_CODE_CREATED,
+            WEB_HTTP_STATUS_CODE_ACCEPTED,
+            WEB_HTTP_STATUS_CODE_NON_AUTH_INFO,
+            WEB_HTTP_STATUS_CODE_NO_CONTENT,
+            WEB_HTTP_STATUS_CODE_RESET_CONTENT,
+            WEB_HTTP_STATUS_CODE_PARTIAL_CONTENT,
+            WEB_HTTP_STATUS_CODE_MULTIPLE_CHOICES,
+            WEB_HTTP_STATUS_CODE_MOVED_PERMANETLY,
+            WEB_HTTP_STATUS_CODE_FOUND,
+            WEB_HTTP_STATUS_CODE_SEE_OTHER,
+            WEB_HTTP_STATUS_CODE_NOT_MODIFIED,
+            WEB_HTTP_STATUS_CODE_USE_PROXY,
+            WEB_HTTP_STATUS_CODE_TEMPORARY_REDIRECT,
+            WEB_HTTP_STATUS_CODE_BAD_REQUEST,
+            WEB_HTTP_STATUS_CODE_UNAUTHORIZED,
+            WEB_HTTP_STATUS_CODE_PAYMENT_REQUIRED,
+            WEB_HTTP_STATUS_CODE_FORBIDDEN,
+            WEB_HTTP_STATUS_CODE_NOT_FOUND,
+            WEB_HTTP_STATUS_CODE_METHOD_NOT_ALLOWED,
+            WEB_HTTP_STATUS_CODE_NOT_ACCEPTABLE,
+            WEB_HTTP_STATUS_CODE_PROXY_AUTH_REQUIRED,
+            WEB_HTTP_STATUS_CODE_REQUEST_TIMEOUT,
+            WEB_HTTP_STATUS_CODE_CONFLICT,
+            WEB_HTTP_STATUS_CODE_GONE,
+            WEB_HTTP_STATUS_CODE_LENGTH_REQUIRED,
+            WEB_HTTP_STATUS_CODE_PRECONDITION_FAILED,
+            WEB_HTTP_STATUS_CODE_ENTITY_TOO_LARGE,
+            WEB_HTTP_STATUS_CODE_URL_TOO_LARGE,
+            WEB_HTTP_STATUS_CODE_UNSUPPORTED_MEDIA,
+            WEB_HTTP_STATUS_CODE_RANGE_NOT_SATISFY,
+            WEB_HTTP_STATUS_CODE_EXPECTATION_FAILED,
+            WEB_HTTP_STATUS_CODE_INTERNAL_ERROR,
+            WEB_HTTP_STATUS_CODE_NOT_IMPLEMENTED,
+            WEB_HTTP_STATUS_CODE_BAD_GATEWAY,
+            WEB_HTTP_STATUS_CODE_SERVICE_UNAVAILABLE,
+            WEB_HTTP_STATUS_CODE_GATEWAY_TIMEOUT,
+            WEB_HTTP_STATUS_CODE_VERSION_ERROR
+        >;
+
+        struct NetXHttpReturnValue {
+            NetXHttpReturnValue() { ; }
+
+            template<typename E>
+            explicit NetXHttpReturnValue(const E e) : value(e) { ; }
+
+            explicit NetXHttpReturnValue(const std::optional<Variant> e) : value(e.value_or(NetXReturnValues::NONE{})) {
+                ;
+            }
+
+            NetXHttpReturnValue(const Variant e) : value(e) { ; }
+            NetXHttpReturnValue(const UINT e) : apiRetVal(e) { ; }
+            NetXHttpReturnValue(const char *e) : msg(e) { ; }
+
+            FNV1a::fnv1a32_t strHash() const {
+                return std::visit([](auto &&e) { return e.strHash; }, value);
+            }
+
+            UINT apiReturnValue() const {
+                if (std::holds_alternative<NetXReturnValues::NONE>(value)) { return apiRetVal; }
+                return std::visit([](auto &&e) { return e.apiReturnValue; }, value);
+            }
+
+#if defined(LIBSMART_ENABLE_ERROR_STRINGS)
+            const char *apiReturnString() const {
+                return std::visit([](auto &&e) { return e.name; }, value);
+            }
+#endif
+
+            const char *message() const {
+                return msg;
+            }
+
+            template<typename Visitor>
+            decltype(auto) visit(Visitor &&v) {
+                return std::visit(std::forward<Visitor>(v), value);
+            }
+
+            template<typename Visitor>
+            decltype(auto) visit(Visitor &&v) const {
+                return std::visit(std::forward<Visitor>(v), value);
+            }
+
+            const Variant &raw() const { return value; }
+
+        private:
+            Variant value = NetXReturnValues::NONE{};
+            UINT apiRetVal = UINT_MAX;
+            const char *msg = "";
+        };
+
+
+        // Eigene Implementierung von 'type_identity' für C++17
+        template<typename T>
+        struct type_identity {
+            using type = T;
+        };
+
+        // Hilfsfunktion: Schleife über alle Typen der `Variant`
+        template<typename Func, size_t... Is>
+        static void forEachTypeImpl(Func &&func, std::index_sequence<Is...>) {
+            using VariantType = Variant;
+            (..., func(type_identity<std::variant_alternative_t<Is, VariantType> >{}));
+        }
+
+        template<typename Func>
+        static void forEachType(Func &&func) {
+            constexpr size_t VariantSize = std::variant_size<Variant>::value;
+            forEachTypeImpl(std::forward<Func>(func), std::make_index_sequence<VariantSize>{});
+        }
+
+        static auto find(uint32_t subject) -> std::optional<Variant> {
+            std::optional<Variant> result;
+
+            forEachType(
+                [&subject, &result](const auto type_info) -> void {
+                    using T = typename decltype(type_info)::type;
+                    T instance{};
+                    if (instance.strHash == subject || instance.apiReturnValue == subject) {
+                        result = instance;
+                    }
+                });
+
+            return result;
+        }
+    };
+}

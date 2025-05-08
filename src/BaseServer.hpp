@@ -8,6 +8,7 @@
 #include "Stm32NetXHttpWebServer.hpp"
 #include "Loggable.hpp"
 #include "Nameable.hpp"
+#include "Result.hpp"
 #include "EventFlags/EventFlags.hpp"
 #include "Stm32NetX.hpp"
 
@@ -20,6 +21,10 @@ namespace Stm32NetXHttpWebServer {
         friend class Request;
 
     public:
+        static constexpr const char *COMPONENT_NAME = Stm32NetXHttpWebServer::COMPONENT_NAME;
+        static constexpr char CLASS_NAME[] = "BaseServer";
+        const char *INSTANCE_NAME{getName()};
+
         using Flags = enum: ULONG {
             NONE = 0,
             IS_CREATED = 1UL << 0,
@@ -92,6 +97,14 @@ namespace Stm32NetXHttpWebServer {
         UINT query_get(NX_PACKET *packet_ptr, UINT query_number, CHAR *query_ptr, UINT *query_size,
                        UINT max_query_size);
 
+
+        nxHttpResult_t callback_data_send(VOID *data_ptr, ULONG data_length);
+
+        nxHttpResult_t callback_generate_response_header(NX_PACKET **packet_pptr,
+                                                                 const CHAR *status_code,
+                                                                 UINT content_length,
+                                                                 const CHAR *content_type,
+                                                                 const CHAR *additional_header);
 
 #if defined(LIBSMART_STM32NETX_ENABLE_TLS) && defined(NX_WEB_HTTPS_ENABLE)
 
