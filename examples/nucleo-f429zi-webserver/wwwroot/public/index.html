@@ -61,6 +61,21 @@
     <div id="page2" class="page">
         <h1>Einstellungen</h1>
         <p>Hier könnten Einstellungen stehen.</p>
+
+        <form method="post" action="/settings">
+            <div>
+                <label for="name">Name:</label>
+                <input type="text" id="name" name="name">
+            </div>
+            <div>
+                <label for="agree">
+                    <input type="checkbox" id="agree" name="agree">
+                    Ich stimme zu
+                </label>
+            </div>
+            <button type="submit">Speichern</button>
+        </form>
+
     </div>
 
     <div id="page3" class="page">
