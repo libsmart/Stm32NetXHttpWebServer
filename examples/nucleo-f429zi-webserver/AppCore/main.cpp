@@ -199,7 +199,7 @@ void loopOnce() {
 
     static Stm32NetXHttpWebServer::ServerCallback webServerCallback(webServer);
 
-    static uint8_t webServerStack[2048]{};
+    static uint8_t webServerStack[1024 * 10]{};
     webServer.create(
         webServer.getNameNonConst(),
         Stm32NetX::NX->getIpInstance(),

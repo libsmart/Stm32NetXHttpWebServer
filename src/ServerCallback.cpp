@@ -14,26 +14,41 @@ UINT ServerCallback::notifyCallback(ServerHttpMethod requestType,
                                     resourceString_t &resourceString,
                                     Packet &packet) {
     server.log(Stm32ItmLogger::LoggerInterface::Severity::DEBUGGING)
-            ->printf("%s::%s[%s]::notifyCallback()\r\n", COMPONENT_NAME, CLASS_NAME, server.getName());
+            ->printf("%s::%s[%s]::notifyCallback(%s, \"%s\", %p)\r\n", COMPONENT_NAME, CLASS_NAME, server.getName(),
+                     (const char *) requestType, resourceString.c_str(), packet.getNxPacket());
 
     Packet responsePacket(nullptr, server.getLogger());
 
-    if (requestType == ServerHttpMethod::GET && resourceString == "/") {
+    if (requestType == Method::GET{} && resourceString == "/") {
         generateResponseHeader(responsePacket,
                                NX_WEB_HTTP_STATUS_OK,
                                index_html_len,
                                "text/html",
                                "Server: NetX WEB HTTP 5.10\r\n");
-
         try {
             responsePacket.dataAppend(index_html, index_html_len);
             packetSend(responsePacket);
-        } catch (const std::exception &e) {
-            responsePacket.release();
+        } catch (...) {
+            try { responsePacket.release(); } catch (...) { ; }
         }
-
         return (NX_WEB_HTTP_CALLBACK_COMPLETED);
     }
+
+    if (requestType == Method::GET{} && resourceString == "/img/Logo_mit_URL_Transparent_300.png") {
+        generateResponseHeader(responsePacket,
+                               NX_WEB_HTTP_STATUS_OK,
+                               img_Logo_mit_URL_Transparent_300_png_len,
+                               "image/png",
+                               "Server: NetX WEB HTTP 5.10\r\n");
+        try {
+            responsePacket.dataAppend(img_Logo_mit_URL_Transparent_300_png, img_Logo_mit_URL_Transparent_300_png_len);
+            packetSend(responsePacket);
+        } catch (...) {
+            try { responsePacket.release(); } catch (...) { ; }
+        }
+        return (NX_WEB_HTTP_CALLBACK_COMPLETED);
+    }
+
 
     return 0;
 }
@@ -44,7 +59,8 @@ nxHttpResult_t ServerCallback::generateResponseHeader(Packet &responsePkt, const
             ->printf("%s::%s[%s]::generateResponseHeader()\r\n", COMPONENT_NAME, CLASS_NAME, server.getName());
 
     NX_PACKET *pkt;
-    const auto ret = server.callback_generate_response_header(&pkt, statusCode, contentLength, contentType, additionalHeader);
+    const auto ret = server.callback_generate_response_header(&pkt, statusCode, contentLength, contentType,
+                                                              additionalHeader);
     responsePkt = pkt;
     return ret;
 }
