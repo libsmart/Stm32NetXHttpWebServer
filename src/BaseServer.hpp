@@ -11,6 +11,7 @@
 #include "Result.hpp"
 #include "EventFlags/EventFlags.hpp"
 #include "Stm32NetX.hpp"
+#include "Callback/GenericCallback.hpp"
 
 extern "C" {
 #include "nx_web_http_server.h"
@@ -105,6 +106,8 @@ namespace Stm32NetXHttpWebServer {
                                                                  UINT content_length,
                                                                  const CHAR *content_type,
                                                                  const CHAR *additional_header);
+
+        nxHttpResult_t callback_packet_send(NX_PACKET *packet_ptr);
 
 #if defined(LIBSMART_STM32NETX_ENABLE_TLS) && defined(NX_WEB_HTTPS_ENABLE)
 

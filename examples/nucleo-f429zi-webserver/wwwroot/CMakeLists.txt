@@ -26,12 +26,15 @@ endforeach()
 
 # Erstelle eine zusammenfassende Header-Datei
 set(COMBINED_HEADER "${CMAKE_CURRENT_BINARY_DIR}/wwwroot.h")
-file(WRITE ${COMBINED_HEADER} "#pragma once\n")
+file(WRITE ${COMBINED_HEADER} "")
+file(APPEND ${COMBINED_HEADER} "#ifndef WWWROOT_H\n")
+file(APPEND ${COMBINED_HEADER} "#define WWWROOT_H\n")
 #file(APPEND ${COMBINED_HEADER} "namespace wwwroot {\n\n")
 foreach(HEADER ${GENERATED_HEADERS})
     get_filename_component(HEADER_NAME ${HEADER} NAME)
     file(APPEND ${COMBINED_HEADER} "#include \"${HEADER_NAME}\"\n")
 endforeach()
+file(APPEND ${COMBINED_HEADER} "#endif\n\n")
 #file(APPEND ${COMBINED_HEADER} "\n}\n\n")
 
 # Erstelle die Bibliothek mit allen generierten Header-Dateien

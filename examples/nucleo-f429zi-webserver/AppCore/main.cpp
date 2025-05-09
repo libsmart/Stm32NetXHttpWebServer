@@ -16,10 +16,10 @@
 #include "RunOnce.hpp"
 #include "RunThreadEvery.hpp"
 #include "RunThreadOnce.hpp"
+#include "ServerCallback.hpp"
 #include "Stm32NetX.hpp"
 #include "Command/RegisterCommands.hpp"
 #include "Dns/Dns.hpp"
-#include "wwwroot.h"
 #include "Exception/NetXHttpWebServerException.hpp"
 #include "Packet/Packet.hpp"
 #include "String/FixedString.hpp"
@@ -86,6 +86,7 @@ UINT my_request_notify(NX_WEB_HTTP_SERVER *server_ptr, UINT request_type, CHAR *
         // webServer.query_get(packet_ptr, 0, str_ptr1, &str_size, sizeof(str_ptr1));
         // Logger.printf("query_ptr = %s\r\n", str_ptr1);
 
+        /*
         if (res == "/") {
             try {
                 webServer.callback_generate_response_header(&response_pkt,
@@ -99,7 +100,7 @@ UINT my_request_notify(NX_WEB_HTTP_SERVER *server_ptr, UINT request_type, CHAR *
             } catch (...) {
                 throw;
             }
-            /* Now add data to the packet. */
+            /* Now add data to the packet. #1#
             status = nx_packet_data_append(response_pkt, index_html, index_html_len,
                                            server_ptr->nx_web_http_server_packet_pool_ptr, NX_WAIT_FOREVER);
 
@@ -111,6 +112,12 @@ UINT my_request_notify(NX_WEB_HTTP_SERVER *server_ptr, UINT request_type, CHAR *
                 }
             }
         }
+        */
+
+
+
+
+
 
         /*
         if (res == "/img/Logo_mit_URL_Transparent_300.png") {
@@ -189,6 +196,9 @@ void loopOnce() {
         delay(500);
     }
 
+
+    static Stm32NetXHttpWebServer::ServerCallback webServerCallback(webServer);
+
     static uint8_t webServerStack[2048]{};
     webServer.create(
         webServer.getNameNonConst(),
@@ -199,7 +209,7 @@ void loopOnce() {
         sizeof(webServerStack),
         Stm32NetX::NX->getPacketPool(),
         nullptr,
-        my_request_notify
+        webServerCallback.getBounce()
     );
 
     webServer.start();
