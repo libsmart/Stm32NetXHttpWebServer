@@ -55,15 +55,13 @@ UINT ServerCallback::notifyCallback(ServerHttpMethod requestType,
         UCHAR buffer[1440];
 
         NX_PACKET *pkt = packet.getNxPacket();
-        auto srv = reinterpret_cast<NX_WEB_HTTP_SERVER_STRUCT *>(&this->server);
 
-        /* Get the content header. */
-        while (nx_web_http_server_get_entity_header(srv, &pkt, buffer,
-                                                    sizeof(buffer)) == NX_SUCCESS) {
-            /* Header obtained successfully. Get the content data location. */
-            while (nx_web_http_server_get_entity_content(srv, &pkt, &offset, &length) == NX_SUCCESS) {
-                /* Write content data to buffer. */
-                nx_packet_data_extract_offset(pkt, offset, buffer, length, &length);
+        // Get the content header
+        while (server.get_entity_header(&pkt, buffer, sizeof(buffer)).isOk()) {
+            // Header obtained successfully. Get the content data location
+            while (server.get_entity_content(&pkt, &offset, &length).isOk()) {
+                // Write content data to buffer
+                packet.data_extract_offset(offset, buffer, length, &length);
                 buffer[length] = 0;
                 server.log()->println((const char *)buffer);
             }
@@ -71,7 +69,6 @@ UINT ServerCallback::notifyCallback(ServerHttpMethod requestType,
 
         return (NX_WEB_HTTP_CALLBACK_COMPLETED);
     }
-
 
     return 0;
 }

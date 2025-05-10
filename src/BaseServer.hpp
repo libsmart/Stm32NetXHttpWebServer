@@ -102,12 +102,21 @@ namespace Stm32NetXHttpWebServer {
         nxHttpResult_t callback_data_send(VOID *data_ptr, ULONG data_length);
 
         nxHttpResult_t callback_generate_response_header(NX_PACKET **packet_pptr,
-                                                                 const CHAR *status_code,
-                                                                 UINT content_length,
-                                                                 const CHAR *content_type,
-                                                                 const CHAR *additional_header);
+                                                         const CHAR *status_code,
+                                                         UINT content_length,
+                                                         const CHAR *content_type,
+                                                         const CHAR *additional_header);
 
         nxHttpResult_t callback_packet_send(NX_PACKET *packet_ptr);
+
+        nxHttpResult_t get_entity_content(NX_PACKET **packet_pptr,
+                                          ULONG *available_offset,
+                                          ULONG *available_length);
+
+        nxHttpResult_t get_entity_header(NX_PACKET **packet_pptr,
+                                         UCHAR *entity_header_buffer,
+                                         ULONG buffer_size);
+
 
 #if defined(LIBSMART_STM32NETX_ENABLE_TLS) && defined(NX_WEB_HTTPS_ENABLE)
 

@@ -207,7 +207,35 @@ nxHttpResult_t BaseServer::callback_packet_send(NX_PACKET *packet_ptr) {
 
     if (ret != NX_SUCCESS) {
         auto res = nxHttpResult_t::err(ret);
-        LIBSMART_EXCEPTION("nx_web_http_server_callback_generate_response_header()", res, NetXHttpWebServerException)
+        LIBSMART_EXCEPTION("nx_web_http_server_callback_packet_send()", res, NetXHttpWebServerException)
+    }
+    return nxHttpResult_t::ok();
+}
+
+nxHttpResult_t BaseServer::get_entity_content(NX_PACKET **packet_pptr, ULONG *available_offset, ULONG *available_length) {
+    log(Stm32ItmLogger::LoggerInterface::Severity::DEBUGGING)
+    ->printf("%s::%s[%s]::get_entity_content()\r\n", COMPONENT_NAME, CLASS_NAME, getName());
+
+    // @see https://github.com/eclipse-threadx/rtos-docs/blob/main/rtos-docs/netx-duo/netx-duo-web-http/chapter3.md#nx_web_http_server_get_entity_content
+    const auto ret = nx_web_http_server_get_entity_content(this, packet_pptr, available_offset, available_length);
+
+    if (ret != NX_SUCCESS) {
+        auto res = nxHttpResult_t::err(ret);
+        LIBSMART_EXCEPTION("nx_web_http_server_get_entity_content()", res, NetXHttpWebServerException)
+    }
+    return nxHttpResult_t::ok();
+}
+
+nxHttpResult_t BaseServer::get_entity_header(NX_PACKET **packet_pptr, UCHAR *entity_header_buffer, ULONG buffer_size) {
+    log(Stm32ItmLogger::LoggerInterface::Severity::DEBUGGING)
+        ->printf("%s::%s[%s]::get_entity_header()\r\n", COMPONENT_NAME, CLASS_NAME, getName());
+
+    // @see https://github.com/eclipse-threadx/rtos-docs/blob/main/rtos-docs/netx-duo/netx-duo-web-http/chapter3.md#nx_web_http_server_get_entity_header
+    const auto ret = nx_web_http_server_get_entity_header(this, packet_pptr, entity_header_buffer, buffer_size);
+
+    if (ret != NX_SUCCESS) {
+        auto res = nxHttpResult_t::err(ret);
+        LIBSMART_EXCEPTION("nx_web_http_server_get_entity_header()", res, NetXHttpWebServerException)
     }
     return nxHttpResult_t::ok();
 }
