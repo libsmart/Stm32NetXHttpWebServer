@@ -15,6 +15,7 @@ extern "C" {
 #include "nx_web_http_server.h"
 }
 
+using namespace Stm32Common;
 using namespace Stm32NetX;
 
 namespace Stm32NetXHttpWebServer {
@@ -28,8 +29,7 @@ namespace Stm32NetXHttpWebServer {
 
         explicit ServerCallback(BaseServer &server) : INSTANCE_NAME(server.getName()), server(server) { ; }
 
-        using resourceString_t = Stm32Common::String::FixedString<128>;
-        virtual UINT notifyCallback(ServerHttpMethod requestType, resourceString_t &request, Packet &packet);
+        virtual UINT notifyCallback(ServerHttpMethod requestType, BaseServer::Resource &request, Packet &packet);
 
 
 

@@ -12,10 +12,14 @@
 #include "EventFlags/EventFlags.hpp"
 #include "Stm32NetX.hpp"
 #include "Callback/GenericCallback.hpp"
+#include "String/FixedString.hpp"
 
 extern "C" {
 #include "nx_web_http_server.h"
 }
+
+using namespace Stm32Common;
+using namespace Stm32NetX;
 
 namespace Stm32NetXHttpWebServer {
     class BaseServer : protected NX_WEB_HTTP_SERVER, public Stm32ItmLogger::Loggable, public Stm32Common::Nameable {
@@ -25,6 +29,10 @@ namespace Stm32NetXHttpWebServer {
         static constexpr const char *COMPONENT_NAME = Stm32NetXHttpWebServer::COMPONENT_NAME;
         static constexpr char CLASS_NAME[] = "BaseServer";
         const char *INSTANCE_NAME{getName()};
+
+        using Resource = String::FixedString<NX_WEB_HTTP_MAX_RESOURCE>;
+        using Name = String::FixedString<NX_WEB_HTTP_MAX_NAME>;
+        using Password = String::FixedString<NX_WEB_HTTP_MAX_PASSWORD>;
 
         using Flags = enum: ULONG {
             NONE = 0,

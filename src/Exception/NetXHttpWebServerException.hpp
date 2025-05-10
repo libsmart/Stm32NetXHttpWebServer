@@ -66,7 +66,7 @@ namespace Stm32NetXHttpWebServer {
         }
 
     private:
-        nxHttpResult_t nxHttpRes = nxHttpResult_t::err(Stm32NetX::NetXHttpReturnValues::NetXHttpReturnValue{});
+        nxHttpResult_t nxHttpRes = nxHttpResult_t::err(Stm32NetX::Common::NetXHttpReturn::NetXHttpResult{});
     };
 }
 #else

@@ -2534,9 +2534,7 @@
 */
 
 /* If defined, enables HTTPS Server to support multipart HTTP requests. */
-/*
 #define NX_WEB_HTTP_MULTIPART_ENABLE
-*/
 
 /* This sets the maximum number of retransmissions on Server socket. The default
    value is set to 10. */

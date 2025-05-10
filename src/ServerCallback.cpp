@@ -11,7 +11,7 @@
 using namespace Stm32NetXHttpWebServer;
 
 UINT ServerCallback::notifyCallback(ServerHttpMethod requestType,
-                                    resourceString_t &resourceString,
+                                    BaseServer::Resource &resourceString,
                                     Packet &packet) {
     server.log(Stm32ItmLogger::LoggerInterface::Severity::DEBUGGING)
             ->printf("%s::%s[%s]::notifyCallback(%s, \"%s\", %p)\r\n", COMPONENT_NAME, CLASS_NAME, server.getName(),
@@ -52,7 +52,7 @@ UINT ServerCallback::notifyCallback(ServerHttpMethod requestType,
 
     if (requestType == Method::POST{} && resourceString == "/settings") {
         ULONG offset, length;
-        UCHAR buffer[1440];
+        UCHAR buffer[1440]{};
 
         NX_PACKET *pkt = packet.getNxPacket();
 
@@ -97,7 +97,7 @@ UINT ServerCallback::callback(NX_WEB_HTTP_SERVER *server_ptr, UINT request_type,
             ->printf("%s::%s[%s]::callback()\r\n", COMPONENT_NAME, CLASS_NAME, server.getName());
 
 
-    resourceString_t resourceString(resource);
+    BaseServer::Resource resourceString(resource);
     Packet packet(packet_ptr);
 
     return notifyCallback(static_cast<ServerHttpMethod>(request_type), resourceString, packet);
