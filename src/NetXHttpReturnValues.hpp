@@ -1,12 +1,21 @@
 /*
  * SPDX-FileCopyrightText: 2025 Roland Rusch, easy-smart solution GmbH <roland.rusch@easy-smart.ch>
- * SPDX-License-Identifier: AGPL-3.0-only
+ * SPDX-License-Identifier: BSD-3-Clause
  */
 
 #pragma once
-#include "NetXHttpReturnValues.pch"
-#include "Enum/EnumRegistry.hpp"
 
+#include <libsmart_config.hpp>
+#include <climits>
+#include <optional>
+#include "Hash/Fnv1a.hpp"
+#include "Enum/EnumRegistry.hpp"
+#include "Result/NetXResult.hpp"
+
+extern "C" {
+#include "nx_api.h"
+#include "nx_web_http_common.h"
+}
 
 namespace Stm32NetX::Common {
     using namespace Stm32Common;
@@ -130,23 +139,27 @@ IF_STRINGS("NX_" #x) \
 
         static constexpr std::optional<value> find(const UINT code) {
             auto a = registry.find<UINT, extractApiId>(code);
-            if (a.has_value()) return value(&a.value());
+            if (a.has_value()) return a.value();
             return std::nullopt;
         }
 
-        // static constexpr auto extractId(const Meta &e) { return e.id; };
-        // static constexpr value find(const Id code) {
-        //     return value(registry.find<Id, extractId>(code));
-        // }
+        static constexpr auto extractId(const Meta &e) { return e.id; };
+
+        static constexpr std::optional<value> find(const Id code) {
+            auto a = registry.find<Id, extractId>(code);
+            if (a.has_value()) return a.value();
+            return std::nullopt;
+        }
 
 
-        struct NetXHttpResult {
+        struct NetXHttpResult : public NetXResult {
             NetXHttpResult() { ; }
 
             template<typename E>
             explicit NetXHttpResult(const E e) : _v(e) { ; }
 
-            NetXHttpResult(const Common::NetXHttpReturn::Meta &e) : _v(e) { ; }
+            NetXHttpResult(const Stm32NetX::NetXReturn::Meta &e) : NetXResult(e) { apiId = e.apiId; msg = e.name; }
+            NetXHttpResult(const Common::NetXHttpReturn::Meta &e) : _v(e) { apiId = e.apiId; msg = e.name; }
             NetXHttpResult(const UINT e) : apiId(e) { _v.apiId = e; }
             NetXHttpResult(const char *e) : msg(e) { ; }
 
@@ -172,6 +185,13 @@ IF_STRINGS("NX_" #x) \
             }
 
             const Common::NetXHttpReturn::Meta &raw() const { return _v; }
+
+            size_t printTo(PrintInterface &printObject) const override {
+                if (_v.apiId == UINT_MAX) {
+                    return NetXResult::printTo(printObject);
+                }
+                return printObject.printf(" = 0x%02x %s", _v.apiId, _v.name);
+            }
 
         private:
             Common::NetXHttpReturn::Meta _v = data[0];

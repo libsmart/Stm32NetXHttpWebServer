@@ -11,9 +11,9 @@
 
 namespace Stm32NetXHttpWebServer {
     // using Result_t = Stm32Common::Result<void, ReturnValues>;
-    using genericResult_t = Stm32Common::Result<void, UINT>;
+    // using genericResult_t = Stm32Common::Result<void, UINT>;
 
-    using nxResult_t = Stm32Common::Result<void, Stm32NetX::NetXReturnValues::NetXReturnValue>;
+    // using nxResult_t = Stm32Common::Result<void, Stm32NetX::NetXReturnValues::NetXReturnValue>;
     // using nxHttpResult_t = Stm32Common::Result<void, Stm32NetX::NetXHttpReturnValues::NetXHttpReturnValue>;
     using nxHttpResult_t = Stm32Common::Result<void, Stm32NetX::Common::NetXHttpReturn::NetXHttpResult>;
     // using nxHttpResult_t = Stm32Common::Result<void, const Stm32NetX::Common::NetXHttpReturn::Meta>;

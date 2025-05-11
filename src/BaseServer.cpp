@@ -7,11 +7,12 @@
 #include <climits>
 #include <stdexcept>
 
-#include "NetXHttpReturnValues.hpp"
 #include "Address/Address.hpp"
 #include "Address/AddressPrinter.hpp"
+#include "Exception/NetXException.hpp"
 #include "Exception/NetXHttpWebServerException.hpp"
-#include "NetXReturnValues.hpp"
+#include "Result/NetXReturnValues.hpp"
+#include "Result/NetXResult.hpp"
 
 using namespace Stm32NetX;
 using namespace Stm32NetXHttpWebServer;
@@ -185,10 +186,16 @@ nxHttpResult_t BaseServer::callback_generate_response_header(NX_PACKET **packet_
     // ret = 0xFFF;
     // ret = 0x30003;
     if (ret != NX_SUCCESS) {
-        auto a = Common::NetXHttpReturn::find(ret);
-        if (a.has_value()) {
-            auto d = nxHttpResult_t::err(*a.value().get());
-            LIBSMART_EXCEPTION("nx_web_http_server_callback_generate_response_header(x)", d, NetXHttpWebServerException)
+        auto nxRet = NetXReturn::find(ret);
+        if (nxRet.has_value()) {
+            auto d = nxHttpResult_t::err(nxRet.value().get());
+            LIBSMART_EXCEPTION("nx_web_http_server_callback_generate_response_header()", d, NetXHttpWebServerException)
+        }
+
+        auto nxHttpRet = Common::NetXHttpReturn::find(ret);
+        if (nxHttpRet.has_value()) {
+            auto d = nxHttpResult_t::err(nxHttpRet.value().get());
+            LIBSMART_EXCEPTION("nx_web_http_server_callback_generate_response_header()", d, NetXHttpWebServerException)
         }
         auto res = nxHttpResult_t::err(ret);
         LIBSMART_EXCEPTION("nx_web_http_server_callback_generate_response_header()", res, NetXHttpWebServerException)
@@ -248,7 +255,7 @@ nxHttpResult_t BaseServer::get_entity_header(NX_PACKET **packet_pptr, UCHAR *ent
         auto a = Common::NetXHttpReturn::find(ret);
         if (a.has_value()) {
             auto b = a.value();
-            auto c = *a.value().get();
+            auto c = a.value().get();
             auto d = nxHttpResult_t::err(c);
             LIBSMART_EXCEPTION("nx_web_http_server_get_entity_header(x)", d, NetXHttpWebServerException)
         }
