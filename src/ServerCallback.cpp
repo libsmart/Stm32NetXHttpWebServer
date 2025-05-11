@@ -51,11 +51,54 @@ UINT ServerCallback::notifyCallback(ServerHttpMethod requestType,
 
 
     if (requestType == Method::POST{} && resourceString == "/settings") {
-        ULONG offset, length;
-        UCHAR buffer[1440]{};
+        ULONG length;
+        CHAR buffer[1440]{};
 
         NX_PACKET *pkt = packet.getNxPacket();
 
+        // CHAR param_ptr[100]{};
+        // UINT param_size=0;
+        // server.query_get(pkt, 0, param_ptr, &param_size, sizeof(param_ptr));
+
+        server.content_length_get(pkt, &length);
+        server.log()->printf("Content-Length: %d\r\n", length);
+
+        UINT actual_size{};
+        server.content_get(pkt, 0, buffer, sizeof(buffer), &actual_size);
+        server.log()->printf("Content: %s\r\n", buffer);
+
+
+        const char *key = strtok((char *)buffer, "&");
+        while (key != NULL) {
+            char *value = strchr(key, '=');
+            if (value) {
+                *value = '\0';
+                value++;
+
+                // key enthält den Parameternamen
+                // value enthält den Parameterwert
+                // Hier kannst du die Parameter weiterverarbeiten
+
+                server.log()->printf("key: %s, value: %s\r\n", key, value);
+            }
+            key = strtok(NULL, "&");
+        }
+
+
+        generateResponseHeader(responsePacket,
+                       NX_WEB_HTTP_STATUS_OK,
+                       0,
+                       "text/plain",
+                       "Server: NetX WEB HTTP 5.10\r\n");
+        try {
+            packetSend(responsePacket);
+        } catch (...) {
+            try { responsePacket.release(); } catch (...) { ; }
+        }
+        return (NX_WEB_HTTP_CALLBACK_COMPLETED);
+
+
+        /*
         // Get the content header
         while (server.get_entity_header(&pkt, buffer, sizeof(buffer)).isOk()) {
             // Header obtained successfully. Get the content data location
@@ -66,6 +109,7 @@ UINT ServerCallback::notifyCallback(ServerHttpMethod requestType,
                 server.log()->println((const char *)buffer);
             }
         }
+        */
 
         return (NX_WEB_HTTP_CALLBACK_COMPLETED);
     }

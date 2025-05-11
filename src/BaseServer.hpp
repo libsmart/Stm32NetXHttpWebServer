@@ -97,15 +97,9 @@ namespace Stm32NetXHttpWebServer {
 
         UINT stop();
 
-        UINT type_get_extended(CHAR *name, UINT name_length,
-                               CHAR *http_type_string, UINT http_type_string_max_size, UINT *string_size);
+        using cache_info_get_callback = UINT (*)(CHAR *resource, UINT *max_age, NX_WEB_HTTP_SERVER_DATE *date);
 
-        UINT param_get(NX_PACKET *packet_ptr, UINT param_number, CHAR *param_ptr, UINT *param_size,
-                       UINT max_param_size);
-
-        UINT query_get(NX_PACKET *packet_ptr, UINT query_number, CHAR *query_ptr, UINT *query_size,
-                       UINT max_query_size);
-
+        nxHttpResult_t cache_info_callback_set(cache_info_get_callback cache_info_get);
 
         nxHttpResult_t callback_data_send(VOID *data_ptr, ULONG data_length);
 
@@ -115,7 +109,38 @@ namespace Stm32NetXHttpWebServer {
                                                          const CHAR *content_type,
                                                          const CHAR *additional_header);
 
+        nxHttpResult_t callback_generate_response_header_extended(NX_PACKET **packet_pptr,
+                                                                  CHAR *status_code,
+                                                                  UINT status_code_length,
+                                                                  UINT content_length,
+                                                                  CHAR *content_type,
+                                                                  UINT content_type_length,
+                                                                  CHAR *additional_header,
+                                                                  UINT additional_header_length);
+
         nxHttpResult_t callback_packet_send(NX_PACKET *packet_ptr);
+
+        // nxHttpResult_t callback_response_send(CHAR *header, CHAR *information, CHAR additional_info);
+
+        // nxHttpResult_t callback_response_send_extended(CHAR *header, UINT header_length,
+        //                                                CHAR *information,
+        //                                                UINT information_length,
+        //                                                CHAR additional_info,
+        //                                                UINT additional_info_length);
+
+        nxHttpResult_t content_get(NX_PACKET *packet_ptr,
+                                   ULONG byte_offset,
+                                   CHAR *destination_ptr,
+                                   UINT destination_size,
+                                   UINT *actual_size);
+
+        // nxHttpResult_t content_get_extended(NX_PACKET *packet_ptr,
+        //                                     ULONG byte_offset,
+        //                                     CHAR *destination_ptr,
+        //                                     UINT destination_size,
+        //                                     UINT *actual_size);
+
+        nxHttpResult_t content_length_get(NX_PACKET *packet_ptr, ULONG *content_length);
 
         nxHttpResult_t get_entity_content(NX_PACKET **packet_pptr,
                                           ULONG *available_offset,
@@ -125,9 +150,69 @@ namespace Stm32NetXHttpWebServer {
                                          UCHAR *entity_header_buffer,
                                          ULONG buffer_size);
 
+        // using gmt_get_callback = VOID (*)(NX_WEB_HTTP_SERVER_DATE *date);
+        // nxHttpResult_t gmt_callback_set(gmt_get_callback gmt_get);
+
+        // using invalid_username_password_callback = UINT (*)(CHAR *resource, ULONG client_address, UINT request_type);
+        // nxHttpResult_t invalid_userpassword_notify_set(invalid_username_password_callback invalid_username_password);
+
+        // nxHttpResult_t mime_maps_additional_set(NX_WEB_HTTP_SERVER_MIME_MAP *mime_maps, UINT mime_maps_num);
+
+        // nxHttpResult_t response_packet_allocate(NX_PACKET **packet_ptr, ULONG wait_option);
+
+        // nxHttpResult_t packet_content_find(NX_PACKET **packet_ptr, UINT *content_length);
+
+        // nxHttpResult_t packet_get(NX_PACKET **packet_ptr);
+
+        nxHttpResult_t param_get(NX_PACKET *packet_ptr, UINT param_number, CHAR *param_ptr, UINT *param_size,
+                       UINT max_param_size);
+
+        UINT query_get(NX_PACKET *packet_ptr, UINT query_number, CHAR *query_ptr, UINT *query_size,
+                       UINT max_query_size);
+
+        // nxHttpResult_t response_chunked_set(UINT chunk_size, NX_PACKET *packet_ptr);
+
+        // nxHttpResult_t type_get(CHAR *name, CHAR *http_type_string, UINT *string_size);
+
+        UINT type_get_extended(CHAR *name, UINT name_length,
+                               CHAR *http_type_string, UINT http_type_string_max_size, UINT *string_size);
+
+        // using digest_authenticate_callback = UINT (*)(NX_WEB_HTTP_SERVER *server_ptr,
+        // CHAR *name_ptr,
+        // CHAR *realm_ptr,
+        // CHAR *password_ptr,
+        // CHAR *method,
+        // CHAR *authorization_uri,
+        // CHAR *authorization_nc,
+        // CHAR *authorization_cnonce);
+        // nxHttpResult_t digest_authenticate_notify_set(digest_authenticate_callback digest_authenticate);
+
+        // using authentication_check_extended_callback = UINT (*)(
+        // NX_WEB_HTTP_SERVER *server_ptr,
+        // UINT request_type,
+        // CHAR *resource,
+        // CHAR **name,
+        // UINT *name_length,
+        // CHAR **password,
+        // UINT password_length,
+        // CHAR **realm,
+        // UINT *realm_length);
+        // nxHttpResult_t authenticate_check_set(authentication_check_extended_callback authentication_check_extended);
+
 
 #if defined(LIBSMART_STM32NETX_ENABLE_TLS) && defined(NX_WEB_HTTPS_ENABLE)
-
+        nxHttpResult_t secure_configure(const NX_SECURE_TLS_CRYPTO *crypto_table,
+                                        VOID *metadata_buffer,
+                                        ULONG metadata_size,
+                                        UCHAR *packet_buffer,
+                                        UINT packet_buffer_size,
+                                        NX_SECURE_X509_CERT *identity_certificate,
+                                        NX_SECURE_X509_CERT *trusted_certificates[],
+                                        UINT trusted_certs_num,
+                                        NX_SECURE_X509_CERT *remote_certificates[],
+                                        UINT remote_certs_num,
+                                        UCHAR *remote_certificate_buffer,
+                                        UINT remote_cert_buffer_size);
 #endif
 
     protected:
