@@ -29,7 +29,7 @@ namespace Stm32NetXHttpWebServer {
 
         explicit ServerCallback(BaseServer &server) : INSTANCE_NAME(server.getName()), server(server) { ; }
 
-        virtual UINT notifyCallback(ServerHttpMethod requestType, BaseServer::Resource &request, Packet &packet);
+        virtual UINT notifyCallback(ServerHttpMethod requestType, BaseServer::Resource &resource, Packet &packet);
 
 
 

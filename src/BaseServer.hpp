@@ -33,6 +33,7 @@ namespace Stm32NetXHttpWebServer {
         using Resource = String::FixedString<NX_WEB_HTTP_MAX_RESOURCE>;
         using Name = String::FixedString<NX_WEB_HTTP_MAX_NAME>;
         using Password = String::FixedString<NX_WEB_HTTP_MAX_PASSWORD>;
+        using Realm = String::FixedString<NX_WEB_HTTP_MAX_PASSWORD>;
 
         using Flags = enum: ULONG {
             NONE = 0,
@@ -187,17 +188,17 @@ namespace Stm32NetXHttpWebServer {
         // CHAR *authorization_cnonce);
         // nxHttpResult_t digest_authenticate_notify_set(digest_authenticate_callback digest_authenticate);
 
-        // using authentication_check_extended_callback = UINT (*)(
-        // NX_WEB_HTTP_SERVER *server_ptr,
-        // UINT request_type,
-        // CHAR *resource,
-        // CHAR **name,
-        // UINT *name_length,
-        // CHAR **password,
-        // UINT password_length,
-        // CHAR **realm,
-        // UINT *realm_length);
-        // nxHttpResult_t authenticate_check_set(authentication_check_extended_callback authentication_check_extended);
+        using authentication_check_extended_callback = UINT (*)(
+        NX_WEB_HTTP_SERVER *server_ptr,
+        UINT request_type,
+        CHAR *resource,
+        CHAR **name,
+        UINT *name_length,
+        CHAR **password,
+        UINT *password_length,
+        CHAR **realm,
+        UINT *realm_length);
+        nxHttpResult_t authenticate_check_set(authentication_check_extended_callback authentication_check_extended);
 
 
 #if defined(LIBSMART_STM32NETX_ENABLE_TLS) && defined(NX_WEB_HTTPS_ENABLE)

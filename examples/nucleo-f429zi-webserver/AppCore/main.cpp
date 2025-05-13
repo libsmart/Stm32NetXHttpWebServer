@@ -18,11 +18,15 @@
 #include "RunThreadOnce.hpp"
 #include "ServerCallback.hpp"
 #include "Stm32NetX.hpp"
+#include "Authentication/AuthenticationCheckCallback.hpp"
+#include "Authentication/AuthenticationCheckExtendedCallback.hpp"
 #include "Command/RegisterCommands.hpp"
 #include "Dns/Dns.hpp"
 #include "Exception/NetXHttpWebServerException.hpp"
 #include "Packet/Packet.hpp"
 #include "String/FixedString.hpp"
+#include "Webserver/AuthCheckCb.hpp"
+#include "Webserver/AuthenticationCheckExtendedCallback.hpp"
 
 /**
  * @brief Setup function.
@@ -198,6 +202,8 @@ void loopOnce() {
 
 
     static Stm32NetXHttpWebServer::ServerCallback webServerCallback(webServer);
+    // static AppCore::Webserver::AuthenticationCheckExtendedCallback webServerAuthenticationCheckExtendedCallback(webServer);
+    static AppCore::Webserver::AuthCheckCb webServerAuthenticationCheckCallback(webServer);
 
     static uint8_t webServerStack[1024 * 10]{};
     webServer.create(
@@ -208,9 +214,12 @@ void loopOnce() {
         &webServerStack,
         sizeof(webServerStack),
         Stm32NetX::NX->getPacketPool(),
-        nullptr,
+        webServerAuthenticationCheckCallback.getBounce(),
         webServerCallback.getBounce()
     );
+
+
+    // webServer.authenticate_check_set(webServerAuthenticationCheckExtendedCallback.getBounce());
 
     webServer.start();
 }

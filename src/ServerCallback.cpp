@@ -11,15 +11,15 @@
 using namespace Stm32NetXHttpWebServer;
 
 UINT ServerCallback::notifyCallback(ServerHttpMethod requestType,
-                                    BaseServer::Resource &resourceString,
+                                    BaseServer::Resource &resource,
                                     Packet &packet) {
     server.log(Stm32ItmLogger::LoggerInterface::Severity::DEBUGGING)
             ->printf("%s::%s[%s]::notifyCallback(%s, \"%s\", %p)\r\n", COMPONENT_NAME, CLASS_NAME, server.getName(),
-                     (const char *) requestType, resourceString.c_str(), packet.getNxPacket());
+                     (const char *) requestType, resource.c_str(), packet.getNxPacket());
 
     Packet responsePacket(nullptr, server.getLogger());
 
-    if (requestType == Method::GET{} && resourceString == "/") {
+    if (requestType == Method::GET{} && resource == "/") {
         generateResponseHeader(responsePacket,
                                NX_WEB_HTTP_STATUS_OK,
                                index_html_len,
@@ -34,7 +34,7 @@ UINT ServerCallback::notifyCallback(ServerHttpMethod requestType,
         return (NX_WEB_HTTP_CALLBACK_COMPLETED);
     }
 
-    if (requestType == Method::GET{} && resourceString == "/img/Logo_mit_URL_Transparent_300.png") {
+    if (requestType == Method::GET{} && resource == "/img/Logo_mit_URL_Transparent_300.png") {
         generateResponseHeader(responsePacket,
                                NX_WEB_HTTP_STATUS_OK,
                                img_Logo_mit_URL_Transparent_300_png_len,
@@ -50,7 +50,7 @@ UINT ServerCallback::notifyCallback(ServerHttpMethod requestType,
     }
 
 
-    if (requestType == Method::POST{} && resourceString == "/settings") {
+    if (requestType == Method::POST{} && resource == "/settings") {
         ULONG length;
         CHAR buffer[1440]{};
 
@@ -68,7 +68,7 @@ UINT ServerCallback::notifyCallback(ServerHttpMethod requestType,
         server.log()->printf("Content: %s\r\n", buffer);
 
 
-        const char *key = strtok((char *)buffer, "&");
+        const char *key = strtok((char *) buffer, "&");
         while (key != NULL) {
             char *value = strchr(key, '=');
             if (value) {
@@ -86,10 +86,10 @@ UINT ServerCallback::notifyCallback(ServerHttpMethod requestType,
 
 
         generateResponseHeader(responsePacket,
-                       NX_WEB_HTTP_STATUS_OK,
-                       0,
-                       "text/plain",
-                       "Server: NetX WEB HTTP 5.10\r\n");
+                               NX_WEB_HTTP_STATUS_SEE_OTHER,
+                               0,
+                               "text/plain",
+                               "Server: NetX WEB HTTP 5.10\r\nLocation: /\r\n");
         try {
             packetSend(responsePacket);
         } catch (...) {

@@ -371,3 +371,18 @@ UINT BaseServer::type_get_extended(CHAR *name, UINT name_length, CHAR *http_type
     return ret;
 }
 
+nxHttpResult_t BaseServer::authenticate_check_set(authentication_check_extended_callback authentication_check_extended) {
+    log(Stm32ItmLogger::LoggerInterface::Severity::DEBUGGING)
+        ->printf("Stm32NetXHttpWebServer::BaseServer[%s]::authenticate_check_set()\r\n", getName());
+
+    // @see https://github.com/eclipse-threadx/rtos-docs/blob/main/rtos-docs/netx-duo/netx-duo-web-http/chapter3.md#nx_web_http_server_authenticate_check_set
+    const auto ret = nx_web_http_server_authentication_check_set(this, authentication_check_extended);
+
+    if (ret != NX_SUCCESS) {
+        constexpr char fmt[] =
+                "Stm32NetXHttpWebServer::BaseServer[%s]: nx_web_http_server_authentication_check_set() = 0x%02x";
+        LIBSMART_HANDLE_ERROR(fmt, getName(), ret);
+    }
+    return nxHttpResult_t::ok();
+}
+
