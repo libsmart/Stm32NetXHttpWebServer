@@ -371,9 +371,10 @@ UINT BaseServer::type_get_extended(CHAR *name, UINT name_length, CHAR *http_type
     return ret;
 }
 
-nxHttpResult_t BaseServer::authenticate_check_set(authentication_check_extended_callback authentication_check_extended) {
+nxHttpResult_t
+BaseServer::authenticate_check_set(authentication_check_extended_callback authentication_check_extended) {
     log(Stm32ItmLogger::LoggerInterface::Severity::DEBUGGING)
-        ->printf("Stm32NetXHttpWebServer::BaseServer[%s]::authenticate_check_set()\r\n", getName());
+            ->printf("Stm32NetXHttpWebServer::BaseServer[%s]::authenticate_check_set()\r\n", getName());
 
     // @see https://github.com/eclipse-threadx/rtos-docs/blob/main/rtos-docs/netx-duo/netx-duo-web-http/chapter3.md#nx_web_http_server_authenticate_check_set
     const auto ret = nx_web_http_server_authentication_check_set(this, authentication_check_extended);
@@ -386,3 +387,43 @@ nxHttpResult_t BaseServer::authenticate_check_set(authentication_check_extended_
     return nxHttpResult_t::ok();
 }
 
+#if defined(LIBSMART_STM32NETX_ENABLE_TLS) && defined(NX_WEB_HTTPS_ENABLE)
+nxHttpResult_t BaseServer::secure_configure(const NX_SECURE_TLS_CRYPTO *crypto_table,
+                                            void *metadata_buffer,
+                                            ULONG metadata_size,
+                                            UCHAR *packet_buffer,
+                                            UINT packet_buffer_size,
+                                            NX_SECURE_X509_CERT *identity_certificate,
+                                            NX_SECURE_X509_CERT *trusted_certificates[],
+                                            UINT trusted_certs_num,
+                                            NX_SECURE_X509_CERT *remote_certificates[],
+                                            UINT remote_certs_num,
+                                            UCHAR *remote_certificate_buffer,
+                                            UINT remote_cert_buffer_size) {
+    log(Stm32ItmLogger::LoggerInterface::Severity::DEBUGGING)
+            ->printf("%s::%s[%s]::secure_configure()\r\n", COMPONENT_NAME, CLASS_NAME, getName());
+
+    // @see https://github.com/eclipse-threadx/rtos-docs/blob/main/rtos-docs/netx-duo/netx-duo-web-http/chapter3.md#nx_web_http_server_secure_configure
+    const auto ret = nx_web_http_server_secure_configure(this,
+                                                         crypto_table,
+                                                         metadata_buffer,
+                                                         metadata_size,
+                                                         packet_buffer,
+                                                         packet_buffer_size,
+                                                         identity_certificate,
+                                                         trusted_certificates,
+                                                         trusted_certs_num,
+                                                         remote_certificates,
+                                                         remote_certs_num,
+                                                         remote_certificate_buffer,
+                                                         remote_cert_buffer_size
+    );
+
+    if (ret != NX_SUCCESS) {
+        constexpr char fmt[] =
+                "Stm32NetXHttpWebServer::BaseServer[%s]: nx_web_http_server_secure_configure() = 0x%02x";
+        LIBSMART_HANDLE_ERROR(fmt, getName(), ret);
+    }
+    return nxHttpResult_t::ok();
+}
+#endif

@@ -24,9 +24,16 @@
 #include "Dns/Dns.hpp"
 #include "Exception/NetXHttpWebServerException.hpp"
 #include "Packet/Packet.hpp"
+#include "Secure/X509.hpp"
 #include "String/FixedString.hpp"
 #include "Webserver/AuthCheckCb.hpp"
 #include "Webserver/AuthenticationCheckExtendedCallback.hpp"
+
+
+extern unsigned char server_cert_der[];
+extern unsigned char server_cert_key_der[];
+extern unsigned int server_cert_der_len;
+extern unsigned int server_cert_key_der_len;
 
 /**
  * @brief Setup function.
@@ -209,14 +216,38 @@ void loopOnce() {
     webServer.create(
         webServer.getNameNonConst(),
         Stm32NetX::NX->getIpInstance(),
-        80,
+        443,
         nullptr,
         &webServerStack,
         sizeof(webServerStack),
         Stm32NetX::NX->getPacketPool(),
-        webServerAuthenticationCheckCallback.getBounce(),
+        nullptr, //webServerAuthenticationCheckCallback.getBounce(),
         webServerCallback.getBounce()
     );
+
+
+
+    static UCHAR buffer[10240]{};
+    static NX_SECURE_X509_CERT server_certificate{};
+
+    static Secure::X509 x509(&server_certificate, &Stm32ItmLogger::logger);
+    x509.certificateInitialize(
+        server_cert_der, server_cert_der_len,
+        buffer, sizeof(buffer),
+        server_cert_key_der, server_cert_key_der_len,
+        NX_SECURE_X509_KEY_TYPE_RSA_PKCS1_DER
+        // NX_SECURE_X509_KEY_TYPE_EC_DER
+        );
+
+    extern NX_SECURE_TLS_CRYPTO nx_crypto_tls_ciphers;
+    static CHAR crypto_metadata[12*1024 * NX_WEB_HTTP_SERVER_SESSION_MAX];
+    static UCHAR server_tls_packet_buffer[16500 * NX_WEB_HTTP_SERVER_SESSION_MAX];
+
+
+    webServer.secure_configure(&nx_crypto_tls_ciphers,
+        crypto_metadata, sizeof(crypto_metadata), server_tls_packet_buffer,
+        sizeof(server_tls_packet_buffer), &server_certificate, NX_NULL, 0,
+        NX_NULL, 0, NX_NULL, 0);
 
 
     // webServer.authenticate_check_set(webServerAuthenticationCheckExtendedCallback.getBounce());

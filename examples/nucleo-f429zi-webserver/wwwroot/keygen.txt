@@ -1,0 +1,28 @@
+openssl req -x509 -newkey rsa:2048 -keyout server_cert_key.pem -out server_cert.der -outform der -days 36500 -nodes -subj "/C=CH/L=Perlen/O=ADMIA Solutions AG/CN=ADMIA Terminal 5000" -config nul
+openssl rsa -in server_cert_key.pem -outform DER -out server_cert_key.der
+
+
+openssl genrsa -out server_cert_key.der -outform DER 2048
+
+
+
+
+
+AlmaLinux OpenSSL 1.1.1k
+openssl genrsa -out server_cert_key.pem 2048
+openssl rsa -in server_cert_key.pem -outform DER -out server_cert_key.der
+openssl req -new -x509 -key server_cert_key.pem -out server_cert.pem -days 36500 -subj "/C=CH/L=Perlen/O=ADMIA Solutions AG/CN=ADMIA Terminal 5000"
+openssl x509 -in server_cert.pem -outform DER -out server_cert.der
+
+
+# OpenSSL 3.x kompatibel
+openssl genpkey -algorithm RSA -out key.pem -pkeyopt rsa_keygen_bits:2048
+
+# Umwandeln in PKCS#1 (PEM)
+openssl pkey -in key.pem -out pkcs1.pem -traditional
+
+# Export als DER
+openssl rsa -in pkcs1.pem -outform DER -out key.der
+
+
+
