@@ -5,8 +5,8 @@
 
 #include "ServerCallback.hpp"
 
-#include "globals.hpp"
-#include "wwwroot.h"
+// #include "globals.hpp"
+// #include "wwwroot.h"
 
 using namespace Stm32NetXHttpWebServer;
 
@@ -16,7 +16,7 @@ UINT ServerCallback::notifyCallback(ServerHttpMethod requestType,
     server.log(Stm32ItmLogger::LoggerInterface::Severity::DEBUGGING)
             ->printf("%s::%s[%s]::notifyCallback(%s, \"%s\", %p)\r\n", COMPONENT_NAME, CLASS_NAME, server.getName(),
                      (const char *) requestType, resource.c_str(), packet.getNxPacket());
-
+/*
     Packet responsePacket(nullptr, server.getLogger());
 
     if (requestType == Method::GET{} && resource == "/") {
@@ -96,24 +96,8 @@ UINT ServerCallback::notifyCallback(ServerHttpMethod requestType,
             try { responsePacket.release(); } catch (...) { ; }
         }
         return (NX_WEB_HTTP_CALLBACK_COMPLETED);
-
-
-        /*
-        // Get the content header
-        while (server.get_entity_header(&pkt, buffer, sizeof(buffer)).isOk()) {
-            // Header obtained successfully. Get the content data location
-            while (server.get_entity_content(&pkt, &offset, &length).isOk()) {
-                // Write content data to buffer
-                packet.data_extract_offset(offset, buffer, length, &length);
-                buffer[length] = 0;
-                server.log()->println((const char *)buffer);
-            }
-        }
-        */
-
-        return (NX_WEB_HTTP_CALLBACK_COMPLETED);
     }
-
+*/
     return 0;
 }
 
