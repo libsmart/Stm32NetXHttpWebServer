@@ -121,13 +121,13 @@ namespace Stm32NetXHttpWebServer {
 
         nxHttpResult_t callback_packet_send(NX_PACKET *packet_ptr);
 
-        // nxHttpResult_t callback_response_send(CHAR *header, CHAR *information, CHAR additional_info);
+        nxHttpResult_t callback_response_send(CHAR *header, CHAR *information, CHAR *additional_info);
 
-        // nxHttpResult_t callback_response_send_extended(CHAR *header, UINT header_length,
-        //                                                CHAR *information,
-        //                                                UINT information_length,
-        //                                                CHAR additional_info,
-        //                                                UINT additional_info_length);
+        nxHttpResult_t callback_response_send_extended(const CHAR *header, UINT header_length,
+                                                       const CHAR *information,
+                                                       UINT information_length,
+                                                       const CHAR *additional_info,
+                                                       UINT additional_info_length);
 
         nxHttpResult_t content_get(NX_PACKET *packet_ptr,
                                    ULONG byte_offset,

@@ -236,6 +236,42 @@ nxHttpResult_t BaseServer::callback_packet_send(NX_PACKET *packet_ptr) {
     return nxHttpResult_t::ok();
 }
 
+nxHttpResult_t BaseServer::callback_response_send(CHAR *header, CHAR *information, CHAR *additional_info) {
+    log(Stm32ItmLogger::LoggerInterface::Severity::DEBUGGING)
+            ->printf("%s::%s[%s]::callback_response_send()\r\n", COMPONENT_NAME, CLASS_NAME, getName());
+
+    // @see https://github.com/eclipse-threadx/rtos-docs/blob/main/rtos-docs/netx-duo/netx-duo-web-http/chapter3.md#nx_web_http_server_callback_response_send
+    const auto ret = nx_web_http_server_callback_response_send(this, header, information, additional_info);
+
+    if (ret != NX_SUCCESS) {
+        auto res = nxHttpResult_t::err(ret);
+        LIBSMART_EXCEPTION("nx_web_http_server_callback_response_send()", res, NetXHttpWebServerException)
+    }
+    return nxHttpResult_t::ok();
+}
+
+nxHttpResult_t BaseServer::callback_response_send_extended(const CHAR *header, const UINT header_length,
+                                                           const CHAR *information,
+                                                           const UINT information_length, const CHAR *additional_info,
+                                                           const UINT additional_info_length) {
+    log(Stm32ItmLogger::LoggerInterface::Severity::DEBUGGING)
+            ->printf("%s::%s[%s]::callback_response_send_extended()\r\n", COMPONENT_NAME, CLASS_NAME, getName());
+
+    // @see https://github.com/eclipse-threadx/rtos-docs/blob/main/rtos-docs/netx-duo/netx-duo-web-http/chapter3.md#nx_web_http_server_callback_response_send_extended
+    const auto ret = nx_web_http_server_callback_response_send_extended(this, const_cast<CHAR *>(header),
+                                                                        header_length,
+                                                                        const_cast<CHAR *>(information),
+                                                                        information_length,
+                                                                        const_cast<CHAR *>(additional_info),
+                                                                        additional_info_length);
+
+    if (ret != NX_SUCCESS) {
+        auto res = nxHttpResult_t::err(ret);
+        LIBSMART_EXCEPTION("nx_web_http_server_callback_response_send_extended()", res, NetXHttpWebServerException)
+    }
+    return nxHttpResult_t::ok();
+}
+
 nxHttpResult_t BaseServer::content_get(NX_PACKET *packet_ptr, ULONG byte_offset, CHAR *destination_ptr,
                                        UINT destination_size, UINT *actual_size) {
     log(Stm32ItmLogger::LoggerInterface::Severity::DEBUGGING)

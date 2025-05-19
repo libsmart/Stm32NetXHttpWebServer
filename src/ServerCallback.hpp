@@ -32,20 +32,41 @@ namespace Stm32NetXHttpWebServer {
         virtual UINT notifyCallback(ServerHttpMethod requestType, BaseServer::Resource &resource, Packet &packet);
 
 
-
-
         virtual nxHttpResult_t generateResponseHeader(Packet &responsePkt, const char *statusCode, UINT contentLength,
                                                       const char *contentType, const char *additionalHeader);
 
 
         virtual nxHttpResult_t packetSend(Packet &responsePkt);
 
+        template<size_t N1, size_t N2, size_t N3>
+        nxHttpResult_t responseSendExtended(String::FixedString<N1> &header,
+                                            String::FixedString<N2> &information,
+                                            String::FixedString<N3> &additional_information);
+
+        template<size_t N1>
+        nxHttpResult_t responseSendExtended(String::FixedString<N1> &header);
 
     private:
         UINT callback(NX_WEB_HTTP_SERVER *server_ptr, UINT request_type, CHAR *resource,
                       NX_PACKET *packet_ptr) override;
 
+    protected:
         BaseServer &server;
     };
 
+    template<size_t N1, size_t N2, size_t N3>
+    nxHttpResult_t ServerCallback::responseSendExtended(String::FixedString<N1> &header,
+                                                        String::FixedString<N2> &information,
+                                                        String::FixedString<N3> &additional_information) {
+        return server.callback_response_send_extended(header.c_str(), header.size(),
+                                                      information.c_str(), information.size(),
+                                                      additional_information.c_str(), additional_information.size());
+    }
+
+    template<size_t N1>
+    nxHttpResult_t ServerCallback::responseSendExtended(String::FixedString<N1> &header) {
+        return server.callback_response_send_extended(header.c_str(), header.size(),
+                                                      nullptr, 0,
+                                                      nullptr, 0);
+    }
 }

@@ -149,9 +149,7 @@
    a remote host. By default, TLS will reject self-signed server certificates
    as a security precaution. If this macro is defined, self-signed certificates
    must still be added to the trusted store to be accepted. */
-/*
 #define NX_SECURE_ALLOW_SELF_SIGNED_CERTIFICATES
-*/
 
 /* Defined, this option enables the optional X.509 Client Certificate
    Verification for TLS Servers4. */
@@ -168,9 +166,7 @@
 
 /* Defined, this option disables TLSv1.1 mode. It is defined by default.
    TLSv1.1 is disabled in favor of using only the more-secure TLSv1.25. */
-/*
 #define NX_SECURE_TLS_DISABLE_TLS_1_1
-*/
 
 /* Defined, this option enables the legacy TLSv1.0 mode. TLSv1.0 is considered
    obsolete so it should only be enabled for backward-compatibility with older
@@ -188,9 +184,7 @@
 
 /* Defined, this option enables TLSv1.3 mode. TLS 1.3 is the newest version of
    TLS and is disabled by default.*/
-/*
 #define NX_SECURE_TLS_ENABLE_TLS_1_3
-*/
 
 /* Defined, this option enables protocol version downgrade for TLS client.*/
 /*
@@ -395,14 +389,10 @@
 */
 
 /* Defined, this option enables TLS 1.2 .*/
-/*
 #define NX_SECURE_TLS_TLS_1_2_ENABLED
-*/
 
 /* Defined, this option enables TLS 1.3 .*/
-/*
-*#define NX_SECURE_TLS_TLS_1_3_ENABLED
-*/
+#define NX_SECURE_TLS_TLS_1_3_ENABLED
 
 /* This option defines the TLS maximum psk monce size.
    The default value is 255.*/

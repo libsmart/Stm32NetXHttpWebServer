@@ -92,6 +92,9 @@ Building $${BIN_FILE}")
 include(git_rev_macro.cmake)
 #add_compile_definitions(-DFIRMWARE_VERSION="0.1.0")
 
+#add_compile_definitions(-DNX_INCLUDE_USER_DEFINE_FILE)
+#add_compile_definitions(-DNX_SECURE_INCLUDE_USER_DEFINE_FILE)
+
 add_subdirectory(Lib/Stm32ItmLogger)
 target_link_libraries(${PROJECT_NAME}.elf PRIVATE Stm32ItmLogger)
 

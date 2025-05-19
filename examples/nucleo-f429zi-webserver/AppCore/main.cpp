@@ -16,7 +16,6 @@
 #include "RunOnce.hpp"
 #include "RunThreadEvery.hpp"
 #include "RunThreadOnce.hpp"
-#include "ServerCallback.hpp"
 #include "Stm32NetX.hpp"
 #include "Authentication/AuthenticationCheckCallback.hpp"
 #include "Authentication/AuthenticationCheckExtendedCallback.hpp"
@@ -28,6 +27,7 @@
 #include "String/FixedString.hpp"
 #include "Webserver/AuthCheckCb.hpp"
 #include "Webserver/AuthenticationCheckExtendedCallback.hpp"
+#include "Webserver/RequestCallback.hpp"
 
 
 extern unsigned char server_cert_der[];
@@ -208,7 +208,8 @@ void loopOnce() {
     }
 
 
-    static Stm32NetXHttpWebServer::ServerCallback webServerCallback(webServer);
+    // static Stm32NetXHttpWebServer::ServerCallback webServerCallback(webServer);
+    static AppCore::Webserver::RequestCallback webServerCallback(webServer);
     // static AppCore::Webserver::AuthenticationCheckExtendedCallback webServerAuthenticationCheckExtendedCallback(webServer);
     static AppCore::Webserver::AuthCheckCb webServerAuthenticationCheckCallback(webServer);
 
@@ -216,7 +217,7 @@ void loopOnce() {
     webServer.create(
         webServer.getNameNonConst(),
         Stm32NetX::NX->getIpInstance(),
-        443,
+        80,
         nullptr,
         &webServerStack,
         sizeof(webServerStack),
@@ -226,7 +227,7 @@ void loopOnce() {
     );
 
 
-
+/*
     static UCHAR buffer[10240]{};
     static NX_SECURE_X509_CERT server_certificate{};
 
@@ -239,16 +240,16 @@ void loopOnce() {
         // NX_SECURE_X509_KEY_TYPE_EC_DER
         );
 
-    extern NX_SECURE_TLS_CRYPTO nx_crypto_tls_ciphers;
-    static CHAR crypto_metadata[12*1024 * NX_WEB_HTTP_SERVER_SESSION_MAX];
-    static UCHAR server_tls_packet_buffer[16500 * NX_WEB_HTTP_SERVER_SESSION_MAX];
+    static NX_SECURE_TLS_CRYPTO nx_crypto_tls_ciphers{};
+    static CHAR crypto_metadata[12*1024 * NX_WEB_HTTP_SERVER_SESSION_MAX]{};
+    static UCHAR server_tls_packet_buffer[16500 * NX_WEB_HTTP_SERVER_SESSION_MAX]{};
 
 
     webServer.secure_configure(&nx_crypto_tls_ciphers,
         crypto_metadata, sizeof(crypto_metadata), server_tls_packet_buffer,
         sizeof(server_tls_packet_buffer), &server_certificate, NX_NULL, 0,
         NX_NULL, 0, NX_NULL, 0);
-
+*/
 
     // webServer.authenticate_check_set(webServerAuthenticationCheckExtendedCallback.getBounce());
 
