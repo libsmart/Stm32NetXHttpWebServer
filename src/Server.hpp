@@ -6,11 +6,17 @@
 #pragma once
 
 #include "BaseServer.hpp"
+#include "Packet/Packet.hpp"
+
+using namespace Stm32NetX;
 
 namespace Stm32NetXHttpWebServer {
     class Server : public BaseServer {
-
+    public:
         using BaseServer::BaseServer;
 
+        using contentLengthGetResult = Result<ULONG, Common::NetXHttpReturn::NetXHttpResult>;
+
+        contentLengthGetResult contentLengthGet(Packet &packet);
     };
 }

@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "BaseServer.hpp"
+#include "Server.hpp"
 #include "ServerHttpMethod.hpp"
 #include "Callback/CallbackCapable.hpp"
 #include "String/FixedString.hpp"
@@ -27,7 +27,7 @@ namespace Stm32NetXHttpWebServer {
 
         ServerCallback() = delete;
 
-        explicit ServerCallback(BaseServer &server) : INSTANCE_NAME(server.getName()), server(server) { ; }
+        explicit ServerCallback(Server &server) : INSTANCE_NAME(server.getName()), server(server) { ; }
 
         virtual UINT notifyCallback(ServerHttpMethod requestType, BaseServer::Resource &resource, Packet &packet);
 
@@ -54,7 +54,7 @@ namespace Stm32NetXHttpWebServer {
                       NX_PACKET *packet_ptr) override;
 
     protected:
-        BaseServer &server;
+        Server &server;
     };
 
     template<size_t N1, size_t N2, size_t N3>
