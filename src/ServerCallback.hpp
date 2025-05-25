@@ -46,6 +46,9 @@ namespace Stm32NetXHttpWebServer {
         template<size_t N1>
         nxHttpResult_t responseSendExtended(String::FixedString<N1> &header);
 
+        template<size_t N1>
+        nxHttpResult_t responseSendExtended(const char (&header)[N1]);
+
     private:
         UINT callback(NX_WEB_HTTP_SERVER *server_ptr, UINT request_type, CHAR *resource,
                       NX_PACKET *packet_ptr) override;
@@ -66,6 +69,13 @@ namespace Stm32NetXHttpWebServer {
     template<size_t N1>
     nxHttpResult_t ServerCallback::responseSendExtended(String::FixedString<N1> &header) {
         return server.callback_response_send_extended(header.c_str(), header.size(),
+                                                      nullptr, 0,
+                                                      nullptr, 0);
+    }
+
+    template<size_t N1>
+    nxHttpResult_t ServerCallback::responseSendExtended(const char (&header)[N1]) {
+        return server.callback_response_send_extended(header, N1 - 1,
                                                       nullptr, 0,
                                                       nullptr, 0);
     }
