@@ -278,7 +278,7 @@ nxHttpResult_t BaseServer::content_get(NX_PACKET *packet_ptr, ULONG byte_offset,
             ->printf("%s::%s[%s]::content_get()\r\n", COMPONENT_NAME, CLASS_NAME, getName());
 
     // @see https://github.com/eclipse-threadx/rtos-docs/blob/main/rtos-docs/netx-duo/netx-duo-web-http/chapter3.md#nx_web_http_server_content_get
-    const auto ret = nx_web_http_server_content_get(this, packet_ptr, byte_offset,
+    const auto ret = nx_web_http_server_content_get_extended(this, packet_ptr, byte_offset,
                                                     destination_ptr, destination_size, actual_size);
 
     if (ret != NX_SUCCESS) {

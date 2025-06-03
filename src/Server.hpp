@@ -18,5 +18,7 @@ namespace Stm32NetXHttpWebServer {
         using contentLengthGetResult = Result<ULONG, Common::NetXHttpReturn::NetXHttpResult>;
 
         contentLengthGetResult contentLengthGet(Packet &packet);
+
+        contentLengthGetResult contentGet(Packet &packet, ULONG byteOffset, uint8_t *buffer, size_t sz);
     };
 }

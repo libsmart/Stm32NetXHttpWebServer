@@ -13,3 +13,10 @@ Server::contentLengthGetResult Server::contentLengthGet(Packet &packet) {
     const auto ret = content_length_get(packet.getNxPacket(), &contentLength);
     return ret.isError() ? contentLengthGetResult::err(ret.error()) : contentLengthGetResult::ok(contentLength);
 }
+
+Server::contentLengthGetResult Server::contentGet(Packet &packet, const ULONG byteOffset, uint8_t *buffer, const size_t sz) {
+    UINT actualSize{};
+    const auto ret = content_get(packet.getNxPacket(), byteOffset,
+        reinterpret_cast<CHAR *>(buffer), sz, &actualSize);
+    return ret.isError() ? contentLengthGetResult::err(ret.error()) : contentLengthGetResult::ok(actualSize);
+}

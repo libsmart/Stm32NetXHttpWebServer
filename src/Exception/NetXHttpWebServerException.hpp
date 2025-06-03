@@ -22,6 +22,8 @@ namespace Stm32NetXHttpWebServer {
 
         explicit NetXHttpWebServerException(const nxResult_t &result) : NetXException(result) { ; }
 
+        auto res() const { return nxHttpRes; }
+
         size_t printTo(Stm32Common::PrintInterface &printObject) const override {
             if (nxHttpRes.isError() && (&nxHttpRes.error().raw() == &Stm32NetX::Common::NetXHttpReturn::data[0])) {
                 return NetXException::printTo(printObject);
