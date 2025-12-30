@@ -58,7 +58,7 @@ namespace Stm32NetXHttpWebServer {
             Id id;
         };
 
-        using CallbackResult = Result<CallbackValue, UINT>;
+        using CallbackResult = PrintableResult<CallbackValue, UINT>;
 
         virtual CallbackResult authenticationCallback(ServerHttpMethod requestType,
                                                       BaseServer::Resource &request,
