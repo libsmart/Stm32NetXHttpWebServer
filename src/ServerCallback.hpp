@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: 2025 Roland Rusch, easy-smart solution GmbH <roland.rusch@easy-smart.ch>
+ * SPDX-FileCopyrightText: 2026 Roland Rusch, easy-smart solution GmbH <roland.rusch@easy-smart.ch>
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
@@ -14,9 +14,6 @@
 extern "C" {
 #include "nx_web_http_server.h"
 }
-
-using namespace Stm32Common;
-using namespace Stm32NetX;
 
 namespace Stm32NetXHttpWebServer {
     class ServerCallback : public Stm32Common::CallbackCapable<UINT, NX_WEB_HTTP_SERVER *, UINT, CHAR *, NX_PACKET *> {

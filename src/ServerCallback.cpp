@@ -1,19 +1,17 @@
 /*
- * SPDX-FileCopyrightText: 2025 Roland Rusch, easy-smart solution GmbH <roland.rusch@easy-smart.ch>
+ * SPDX-FileCopyrightText: 2026 Roland Rusch, easy-smart solution GmbH <roland.rusch@easy-smart.ch>
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
 #include "ServerCallback.hpp"
 
-// #include "globals.hpp"
-// #include "wwwroot.h"
-
 using namespace Stm32NetXHttpWebServer;
+using Severity = Stm32ItmLogger::LoggerInterface::Severity;
 
 UINT ServerCallback::notifyCallback(ServerHttpMethod requestType,
                                     BaseServer::Resource &resource,
                                     Packet &packet) {
-    server.log(Stm32ItmLogger::LoggerInterface::Severity::DEBUGGING)
+    server.log(Severity::DEBUGGING)
             ->printf("%s::%s[%s]::notifyCallback(%s, \"%s\", %p)\r\n", COMPONENT_NAME, CLASS_NAME, server.getName(),
                      (const char *) requestType, resource.c_str(), packet.getNxPacket());
 /*
@@ -103,7 +101,7 @@ UINT ServerCallback::notifyCallback(ServerHttpMethod requestType,
 
 nxHttpResult_t ServerCallback::generateResponseHeader(Packet &responsePkt, const char *statusCode, UINT contentLength,
                                                       const char *contentType, const char *additionalHeader) {
-    server.log(Stm32ItmLogger::LoggerInterface::Severity::DEBUGGING)
+    server.log(Severity::DEBUGGING)
             ->printf("%s::%s[%s]::generateResponseHeader()\r\n", COMPONENT_NAME, CLASS_NAME, server.getName());
 
     NX_PACKET *pkt;
@@ -114,14 +112,14 @@ nxHttpResult_t ServerCallback::generateResponseHeader(Packet &responsePkt, const
 }
 
 nxHttpResult_t ServerCallback::packetSend(Packet &responsePkt) {
-    server.log(Stm32ItmLogger::LoggerInterface::Severity::DEBUGGING)
+    server.log(Severity::DEBUGGING)
             ->printf("%s::%s[%s]::packetSend()\r\n", COMPONENT_NAME, CLASS_NAME, server.getName());
     return server.callback_packet_send(responsePkt.getNxPacket());
 }
 
 UINT ServerCallback::callback(NX_WEB_HTTP_SERVER *server_ptr, UINT request_type, CHAR *resource,
                               NX_PACKET *packet_ptr) {
-    server.log(Stm32ItmLogger::LoggerInterface::Severity::DEBUGGING)
+    server.log(Severity::DEBUGGING)
             ->printf("%s::%s[%s]::callback()\r\n", COMPONENT_NAME, CLASS_NAME, server.getName());
 
 

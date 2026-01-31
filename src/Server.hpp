@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: 2024 Roland Rusch, easy-smart solution GmbH <roland.rusch@easy-smart.ch>
+ * SPDX-FileCopyrightText: 2026 Roland Rusch, easy-smart solution GmbH <roland.rusch@easy-smart.ch>
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
@@ -8,11 +8,13 @@
 #include "BaseServer.hpp"
 #include "Packet/Packet.hpp"
 
-using namespace Stm32NetX;
-
 namespace Stm32NetXHttpWebServer {
     class Server : public BaseServer {
     public:
+        static constexpr const char *COMPONENT_NAME = Stm32NetXHttpWebServer::COMPONENT_NAME;
+        static constexpr char CLASS_NAME[] = "Server";
+        const char *INSTANCE_NAME{getName()};
+
         using BaseServer::BaseServer;
 
         using contentLengthGetResult = PrintableResult<ULONG, Common::NetXHttpReturn::NetXHttpResult>;

@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: 2025 Roland Rusch, easy-smart solution GmbH <roland.rusch@easy-smart.ch>
+ * SPDX-FileCopyrightText: 2026 Roland Rusch, easy-smart solution GmbH <roland.rusch@easy-smart.ch>
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
@@ -16,7 +16,7 @@
 
 using namespace Stm32NetX;
 using namespace Stm32NetXHttpWebServer;
-
+using Severity = Stm32ItmLogger::LoggerInterface::Severity;
 
 bool BaseServer::isCreated() {
     return flags.isSet(IS_CREATED);
@@ -25,9 +25,8 @@ bool BaseServer::isCreated() {
 UINT BaseServer::create(CHAR *http_server_name, NX_IP *ip_ptr, UINT server_port, FX_MEDIA *media_ptr, void *stack_ptr,
                         ULONG stack_size, NX_PACKET_POOL *pool_ptr, authentication_check_callback authentication_check,
                         request_notify_callback request_notify) {
-    log(Stm32ItmLogger::LoggerInterface::Severity::DEBUGGING)
-            ->printf("Stm32NetXHttpWebServer::BaseServer[%s]::create(\"%s\", %d)\r\n",
-                     http_server_name, server_port);
+    log(Severity::DEBUGGING)->printf("%s::%s[%s]::create(\"%s\", %d)\r\n", COMPONENT_NAME, CLASS_NAME,
+                                     http_server_name, server_port);
 
     // @see https://github.com/eclipse-threadx/rtos-docs/blob/main/rtos-docs/netx-duo/netx-duo-web-http/chapter3.md#nx_web_http_server_create
     const auto ret = nx_web_http_server_create(this,
@@ -37,15 +36,14 @@ UINT BaseServer::create(CHAR *http_server_name, NX_IP *ip_ptr, UINT server_port,
     );
 
     if (ret != NX_SUCCESS) {
-        constexpr char fmt[] = "Stm32NetXHttpWebServer::BaseServer[%s]: nx_web_http_server_create() = 0x%02x";
-        LIBSMART_HANDLE_ERROR(fmt, getName(), ret);
+        constexpr char fmt[] = "%s::%s[%s]: nx_web_http_server_create() = 0x%02x";
+        LIBSMART_HANDLE_ERROR(fmt, COMPONENT_NAME, CLASS_NAME, getName(), ret);
     }
     return ret;
 }
 
 UINT BaseServer::del() {
-    log(Stm32ItmLogger::LoggerInterface::Severity::DEBUGGING)
-            ->printf("Stm32NetXHttpWebServer::BaseServer[%s]::del()\r\n", getName());
+    log(Severity::DEBUGGING)->printf("%s::%s[%s]::del()\r\n", COMPONENT_NAME, CLASS_NAME, getName());
 
     // @see https://github.com/eclipse-threadx/rtos-docs/blob/main/rtos-docs/netx-duo/netx-duo-web-http/chapter3.md#nx_web_http_server_delete
     const auto ret = nx_web_http_server_delete(this);
@@ -53,43 +51,41 @@ UINT BaseServer::del() {
     std::memset(static_cast<NX_WEB_HTTP_SERVER *>(this), 0, sizeof(NX_WEB_HTTP_SERVER));
 
     if (ret != NX_SUCCESS) {
-        constexpr char fmt[] = "Stm32NetXHttpWebServer::BaseServer[%s]: nx_web_http_server_delete() = 0x%02x";
-        LIBSMART_HANDLE_ERROR(fmt, getName(), ret);
+        constexpr char fmt[] = "%s::%s[%s]: nx_web_http_server_delete() = 0x%02x";
+        LIBSMART_HANDLE_ERROR(fmt, COMPONENT_NAME, CLASS_NAME, getName(), ret);
     }
     return ret;
 }
 
 UINT BaseServer::start() {
-    log(Stm32ItmLogger::LoggerInterface::Severity::DEBUGGING)
-            ->printf("Stm32NetXHttpWebServer::BaseServer[%s]::start()\r\n", getName());
+    log(Severity::DEBUGGING)->printf("%s::%s[%s]::start()\r\n", COMPONENT_NAME, CLASS_NAME, getName());
 
     // @see https://github.com/eclipse-threadx/rtos-docs/blob/main/rtos-docs/netx-duo/netx-duo-web-http/chapter3.md#nx_web_http_server_start
     const auto ret = nx_web_http_server_start(this);
 
     if (ret != NX_SUCCESS) {
-        constexpr char fmt[] = "Stm32NetXHttpWebServer::BaseServer[%s]: nx_web_http_server_start() = 0x%02x";
-        LIBSMART_HANDLE_ERROR(fmt, getName(), ret);
+        constexpr char fmt[] = "%s::%s[%s]: nx_web_http_server_start() = 0x%02x";
+        LIBSMART_HANDLE_ERROR(fmt, COMPONENT_NAME, CLASS_NAME, getName(), ret);
     }
     return ret;
 }
 
 UINT BaseServer::stop() {
-    log(Stm32ItmLogger::LoggerInterface::Severity::DEBUGGING)
-            ->printf("Stm32NetXHttpWebServer::BaseServer[%s]::stop()\r\n", getName());
+    log(Severity::DEBUGGING)->printf("%s::%s[%s]::stop()\r\n", COMPONENT_NAME, CLASS_NAME, getName());
 
     // @see https://github.com/eclipse-threadx/rtos-docs/blob/main/rtos-docs/netx-duo/netx-duo-web-http/chapter3.md#nx_web_http_server_stop
     const auto ret = nx_web_http_server_stop(this);
 
     if (ret != NX_SUCCESS) {
-        constexpr char fmt[] = "Stm32NetXHttpWebServer::BaseServer[%s]: nx_web_http_server_stop() = 0x%02x";
-        LIBSMART_HANDLE_ERROR(fmt, getName(), ret);
+        constexpr char fmt[] = "%s::%s[%s]: nx_web_http_server_stop() = 0x%02x";
+        LIBSMART_HANDLE_ERROR(fmt, COMPONENT_NAME, CLASS_NAME, getName(), ret);
     }
     return ret;
 }
 
 nxHttpResult_t BaseServer::cache_info_callback_set(cache_info_get_callback cache_info_get) {
-    log(Stm32ItmLogger::LoggerInterface::Severity::DEBUGGING)
-            ->printf("%s::%s[%s]::cache_info_callback_set()\r\n", COMPONENT_NAME, CLASS_NAME, getName());
+    log(Severity::DEBUGGING)->printf("%s::%s[%s]::cache_info_callback_set()\r\n", COMPONENT_NAME, CLASS_NAME,
+                                     getName());
 
     // @see https://github.com/eclipse-threadx/rtos-docs/blob/main/rtos-docs/netx-duo/netx-duo-web-http/chapter3.md#nx_web_http_server_cache_info_callback_set
     const auto ret = nx_web_http_server_cache_info_callback_set(this, cache_info_get);
@@ -114,8 +110,7 @@ nxHttpResult_t BaseServer::cache_info_callback_set(cache_info_get_callback cache
 }
 
 nxHttpResult_t BaseServer::callback_data_send(void *data_ptr, ULONG data_length) {
-    log(Stm32ItmLogger::LoggerInterface::Severity::DEBUGGING)
-            ->printf("Stm32NetXHttpWebServer::BaseServer[%s]::callback_data_send()\r\n", getName());
+    log(Severity::DEBUGGING)->printf("%s::%s[%s]::callback_data_send()\r\n", COMPONENT_NAME, CLASS_NAME, getName());
 
     // @see https://github.com/eclipse-threadx/rtos-docs/blob/main/rtos-docs/netx-duo/netx-duo-web-http/chapter3.md#nx_web_http_server_callback_data_send
     const auto ret = nx_web_http_server_callback_data_send(this, data_ptr, data_length);
@@ -131,8 +126,8 @@ nxHttpResult_t BaseServer::callback_data_send(void *data_ptr, ULONG data_length)
 nxHttpResult_t BaseServer::callback_generate_response_header(NX_PACKET **packet_pptr, const CHAR *status_code,
                                                              const UINT content_length,
                                                              const CHAR *content_type, const CHAR *additional_header) {
-    log(Stm32ItmLogger::LoggerInterface::Severity::DEBUGGING)
-            ->printf("%s::%s[%s]::callback_generate_response_header()\r\n", COMPONENT_NAME, CLASS_NAME, getName());
+    log(Severity::DEBUGGING)->printf("%s::%s[%s]::callback_generate_response_header()\r\n", COMPONENT_NAME, CLASS_NAME,
+                                     getName());
 
     // @see https://github.com/eclipse-threadx/rtos-docs/blob/main/rtos-docs/netx-duo/netx-duo-web-http/chapter3.md#nx_web_http_server_callback_generate_response_header
     auto ret = nx_web_http_server_callback_generate_response_header(this,
@@ -169,9 +164,8 @@ nxHttpResult_t BaseServer::callback_generate_response_header_extended(NX_PACKET 
                                                                       CHAR *content_type, UINT content_type_length,
                                                                       CHAR *additional_header,
                                                                       UINT additional_header_length) {
-    log(Stm32ItmLogger::LoggerInterface::Severity::DEBUGGING)
-            ->printf("%s::%s[%s]::callback_generate_response_header_extended()\r\n", COMPONENT_NAME, CLASS_NAME,
-                     getName());
+    log(Severity::DEBUGGING)->printf("%s::%s[%s]::callback_generate_response_header_extended()\r\n",
+                                     COMPONENT_NAME, CLASS_NAME, getName());
 
     // @see https://github.com/eclipse-threadx/rtos-docs/blob/main/rtos-docs/netx-duo/netx-duo-web-http/chapter3.md#nx_web_http_server_callback_generate_response_header_extended
     auto ret = nx_web_http_server_callback_generate_response_header_extended(this,
@@ -204,8 +198,7 @@ nxHttpResult_t BaseServer::callback_generate_response_header_extended(NX_PACKET 
 }
 
 nxHttpResult_t BaseServer::callback_packet_send(NX_PACKET *packet_ptr) {
-    log(Stm32ItmLogger::LoggerInterface::Severity::DEBUGGING)
-            ->printf("%s::%s[%s]::callback_packet_send()\r\n", COMPONENT_NAME, CLASS_NAME, getName());
+    log(Severity::DEBUGGING)->printf("%s::%s[%s]::callback_packet_send()\r\n", COMPONENT_NAME, CLASS_NAME, getName());
 
     // @see https://github.com/eclipse-threadx/rtos-docs/blob/main/rtos-docs/netx-duo/netx-duo-web-http/chapter3.md#nx_web_http_server_callback_packet_send
     const auto ret = nx_web_http_server_callback_packet_send(this, packet_ptr);
@@ -218,8 +211,7 @@ nxHttpResult_t BaseServer::callback_packet_send(NX_PACKET *packet_ptr) {
 }
 
 nxHttpResult_t BaseServer::callback_response_send(CHAR *header, CHAR *information, CHAR *additional_info) {
-    log(Stm32ItmLogger::LoggerInterface::Severity::DEBUGGING)
-            ->printf("%s::%s[%s]::callback_response_send()\r\n", COMPONENT_NAME, CLASS_NAME, getName());
+    log(Severity::DEBUGGING)->printf("%s::%s[%s]::callback_response_send()\r\n", COMPONENT_NAME, CLASS_NAME, getName());
 
     // @see https://github.com/eclipse-threadx/rtos-docs/blob/main/rtos-docs/netx-duo/netx-duo-web-http/chapter3.md#nx_web_http_server_callback_response_send
     const auto ret = nx_web_http_server_callback_response_send(this, header, information, additional_info);
@@ -235,8 +227,8 @@ nxHttpResult_t BaseServer::callback_response_send_extended(const CHAR *header, c
                                                            const CHAR *information,
                                                            const UINT information_length, const CHAR *additional_info,
                                                            const UINT additional_info_length) {
-    log(Stm32ItmLogger::LoggerInterface::Severity::DEBUGGING)
-            ->printf("%s::%s[%s]::callback_response_send_extended()\r\n", COMPONENT_NAME, CLASS_NAME, getName());
+    log(Severity::DEBUGGING)->printf("%s::%s[%s]::callback_response_send_extended()\r\n", COMPONENT_NAME, CLASS_NAME,
+                                     getName());
 
     // @see https://github.com/eclipse-threadx/rtos-docs/blob/main/rtos-docs/netx-duo/netx-duo-web-http/chapter3.md#nx_web_http_server_callback_response_send_extended
     const auto ret = nx_web_http_server_callback_response_send_extended(this, const_cast<CHAR *>(header),
@@ -255,12 +247,11 @@ nxHttpResult_t BaseServer::callback_response_send_extended(const CHAR *header, c
 
 nxHttpResult_t BaseServer::content_get(NX_PACKET *packet_ptr, ULONG byte_offset, CHAR *destination_ptr,
                                        UINT destination_size, UINT *actual_size) {
-    log(Stm32ItmLogger::LoggerInterface::Severity::DEBUGGING)
-            ->printf("%s::%s[%s]::content_get()\r\n", COMPONENT_NAME, CLASS_NAME, getName());
+    log(Severity::DEBUGGING)->printf("%s::%s[%s]::content_get()\r\n", COMPONENT_NAME, CLASS_NAME, getName());
 
     // @see https://github.com/eclipse-threadx/rtos-docs/blob/main/rtos-docs/netx-duo/netx-duo-web-http/chapter3.md#nx_web_http_server_content_get
     const auto ret = nx_web_http_server_content_get_extended(this, packet_ptr, byte_offset,
-                                                    destination_ptr, destination_size, actual_size);
+                                                             destination_ptr, destination_size, actual_size);
 
     if (ret != NX_SUCCESS) {
         auto res = nxHttpResult_t::err(ret);
@@ -270,8 +261,7 @@ nxHttpResult_t BaseServer::content_get(NX_PACKET *packet_ptr, ULONG byte_offset,
 }
 
 nxHttpResult_t BaseServer::content_length_get(NX_PACKET *packet_ptr, ULONG *content_length) {
-    log(Stm32ItmLogger::LoggerInterface::Severity::DEBUGGING)
-            ->printf("%s::%s[%s]::content_length_get()\r\n", COMPONENT_NAME, CLASS_NAME, getName());
+    log(Severity::DEBUGGING)->printf("%s::%s[%s]::content_length_get()\r\n", COMPONENT_NAME, CLASS_NAME, getName());
 
     // @see https://github.com/eclipse-threadx/rtos-docs/blob/main/rtos-docs/netx-duo/netx-duo-web-http/chapter3.md#nx_web_http_server_content_length_get
     const auto ret = nx_web_http_server_content_length_get(packet_ptr, content_length);
@@ -285,8 +275,7 @@ nxHttpResult_t BaseServer::content_length_get(NX_PACKET *packet_ptr, ULONG *cont
 
 nxHttpResult_t BaseServer::get_entity_content(NX_PACKET **packet_pptr, ULONG *available_offset,
                                               ULONG *available_length) {
-    log(Stm32ItmLogger::LoggerInterface::Severity::DEBUGGING)
-            ->printf("%s::%s[%s]::get_entity_content()\r\n", COMPONENT_NAME, CLASS_NAME, getName());
+    log(Severity::DEBUGGING)->printf("%s::%s[%s]::get_entity_content()\r\n", COMPONENT_NAME, CLASS_NAME, getName());
 
 #if !defined(NX_WEB_HTTP_MULTIPART_ENABLE)
     auto res = nxHttpResult_t::err(NX_NOT_ENABLED);
@@ -304,8 +293,7 @@ nxHttpResult_t BaseServer::get_entity_content(NX_PACKET **packet_pptr, ULONG *av
 }
 
 nxHttpResult_t BaseServer::get_entity_header(NX_PACKET **packet_pptr, UCHAR *entity_header_buffer, ULONG buffer_size) {
-    log(Stm32ItmLogger::LoggerInterface::Severity::DEBUGGING)
-            ->printf("%s::%s[%s]::get_entity_header()\r\n", COMPONENT_NAME, CLASS_NAME, getName());
+    log(Severity::DEBUGGING)->printf("%s::%s[%s]::get_entity_header()\r\n", COMPONENT_NAME, CLASS_NAME, getName());
 
 #if !defined(NX_WEB_HTTP_MULTIPART_ENABLE)
     auto res = nxHttpResult_t::err(NX_NOT_ENABLED);
@@ -331,8 +319,7 @@ nxHttpResult_t BaseServer::get_entity_header(NX_PACKET **packet_pptr, UCHAR *ent
 
 nxHttpResult_t BaseServer::param_get(NX_PACKET *packet_ptr, UINT param_number, CHAR *param_ptr, UINT *param_size,
                                      UINT max_param_size) {
-    log(Stm32ItmLogger::LoggerInterface::Severity::DEBUGGING)
-            ->printf("Stm32NetXHttpWebServer::BaseServer[%s]::param_get()\r\n", getName());
+    log(Severity::DEBUGGING)->printf("Stm32NetXHttpWebServer::BaseServer[%s]::param_get()\r\n", getName());
 
     // @see https://github.com/eclipse-threadx/rtos-docs/blob/main/rtos-docs/netx-duo/netx-duo-web-http/chapter3.md#nx_web_http_server_param_get
     const auto ret = nx_web_http_server_param_get(packet_ptr, param_number, param_ptr, param_size, max_param_size);
@@ -358,48 +345,43 @@ nxHttpResult_t BaseServer::param_get(NX_PACKET *packet_ptr, UINT param_number, C
 
 UINT BaseServer::query_get(NX_PACKET *packet_ptr, UINT query_number, CHAR *query_ptr, UINT *query_size,
                            UINT max_query_size) {
-    log(Stm32ItmLogger::LoggerInterface::Severity::DEBUGGING)
-            ->printf("Stm32NetXHttpWebServer::BaseServer[%s]::query_get()\r\n", getName());
+    log(Severity::DEBUGGING)->printf("%s::%s[%s]::query_get()\r\n", COMPONENT_NAME, CLASS_NAME, getName());
 
     // @see https://github.com/eclipse-threadx/rtos-docs/blob/main/rtos-docs/netx-duo/netx-duo-web-http/chapter3.md#nx_web_http_server_query_get
     const auto ret = nx_web_http_server_query_get(packet_ptr, query_number, query_ptr, query_size, max_query_size);
 
     if (ret != NX_SUCCESS) {
-        constexpr char fmt[] = "Stm32NetXHttpWebServer::BaseServer[%s]: nx_web_http_server_query_get() = 0x%02x";
-        LIBSMART_HANDLE_ERROR(fmt, getName(), ret);
+        constexpr char fmt[] = "%s::%s[%s]: nx_web_http_server_query_get() = 0x%02x";
+        LIBSMART_HANDLE_ERROR(fmt, COMPONENT_NAME, CLASS_NAME, getName(), ret);
     }
     return ret;
 }
 
 UINT BaseServer::type_get_extended(CHAR *name, UINT name_length, CHAR *http_type_string, UINT http_type_string_max_size,
                                    UINT *string_size) {
-    log(Stm32ItmLogger::LoggerInterface::Severity::DEBUGGING)
-            ->printf("Stm32NetXHttpWebServer::BaseServer[%s]::type_get_extended()\r\n", getName());
+    log(Severity::DEBUGGING)->printf("%s::%s[%s]::type_get_extended()\r\n", COMPONENT_NAME, CLASS_NAME, getName());
 
     // @see https://github.com/eclipse-threadx/rtos-docs/blob/main/rtos-docs/netx-duo/netx-duo-web-http/chapter3.md#nx_web_http_server_type_get_extended
     const auto ret = nx_web_http_server_type_get_extended(this, name, name_length, http_type_string,
                                                           http_type_string_max_size, string_size);
 
     if (ret != NX_SUCCESS) {
-        constexpr char fmt[] =
-                "Stm32NetXHttpWebServer::BaseServer[%s]: nx_web_http_server_type_get_extended() = 0x%02x";
-        LIBSMART_HANDLE_ERROR(fmt, getName(), ret);
+        constexpr char fmt[] = "%s::%s[%s]: nx_web_http_server_type_get_extended() = 0x%02x";
+        LIBSMART_HANDLE_ERROR(fmt, COMPONENT_NAME, CLASS_NAME, getName(), ret);
     }
     return ret;
 }
 
 nxHttpResult_t
 BaseServer::authenticate_check_set(authentication_check_extended_callback authentication_check_extended) {
-    log(Stm32ItmLogger::LoggerInterface::Severity::DEBUGGING)
-            ->printf("Stm32NetXHttpWebServer::BaseServer[%s]::authenticate_check_set()\r\n", getName());
+    log(Severity::DEBUGGING)->printf("%s::%s[%s]::authenticate_check_set()\r\n", COMPONENT_NAME, CLASS_NAME, getName());
 
     // @see https://github.com/eclipse-threadx/rtos-docs/blob/main/rtos-docs/netx-duo/netx-duo-web-http/chapter3.md#nx_web_http_server_authenticate_check_set
     const auto ret = nx_web_http_server_authentication_check_set(this, authentication_check_extended);
 
     if (ret != NX_SUCCESS) {
-        constexpr char fmt[] =
-                "Stm32NetXHttpWebServer::BaseServer[%s]: nx_web_http_server_authentication_check_set() = 0x%02x";
-        LIBSMART_HANDLE_ERROR(fmt, getName(), ret);
+        constexpr char fmt[] = "%s::%s[%s]: nx_web_http_server_authentication_check_set() = 0x%02x";
+        LIBSMART_HANDLE_ERROR(fmt, COMPONENT_NAME, CLASS_NAME, getName(), ret);
     }
     return nxHttpResult_t::ok();
 }
@@ -417,8 +399,7 @@ nxHttpResult_t BaseServer::secure_configure(const NX_SECURE_TLS_CRYPTO *crypto_t
                                             UINT remote_certs_num,
                                             UCHAR *remote_certificate_buffer,
                                             UINT remote_cert_buffer_size) {
-    log(Stm32ItmLogger::LoggerInterface::Severity::DEBUGGING)
-            ->printf("%s::%s[%s]::secure_configure()\r\n", COMPONENT_NAME, CLASS_NAME, getName());
+    log(Severity::DEBUGGING)->printf("%s::%s[%s]::secure_configure()\r\n", COMPONENT_NAME, CLASS_NAME, getName());
 
     // @see https://github.com/eclipse-threadx/rtos-docs/blob/main/rtos-docs/netx-duo/netx-duo-web-http/chapter3.md#nx_web_http_server_secure_configure
     const auto ret = nx_web_http_server_secure_configure(this,
@@ -437,9 +418,8 @@ nxHttpResult_t BaseServer::secure_configure(const NX_SECURE_TLS_CRYPTO *crypto_t
     );
 
     if (ret != NX_SUCCESS) {
-        constexpr char fmt[] =
-                "Stm32NetXHttpWebServer::BaseServer[%s]: nx_web_http_server_secure_configure() = 0x%02x";
-        LIBSMART_HANDLE_ERROR(fmt, getName(), ret);
+        constexpr char fmt[] = "%s::%s[%s]: nx_web_http_server_secure_configure() = 0x%02x";
+        LIBSMART_HANDLE_ERROR(fmt, COMPONENT_NAME, CLASS_NAME, getName(), ret);
     }
     return nxHttpResult_t::ok();
 }
